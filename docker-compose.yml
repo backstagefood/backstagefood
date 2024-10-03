@@ -6,24 +6,25 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=backstage
+      - POSTGRES_PASSWORD=backstage
       - POSTGRES_DB=backstage
     volumes:
       - ./db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
   server:
+    build:
+      context: .
     depends_on:
       - db
-    image: backstagefood:latest
     restart: always
     ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
-    environment:
-      - SERVER_PORT=${SERVER_PORT}
+      - "8080:8080"
     networks:
       - internal
+    volumes:
+      - ./cmd/app/.env:/app/.env
 networks:
   internal:
     driver: bridge

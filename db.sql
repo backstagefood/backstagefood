@@ -1,4 +1,4 @@
-CREATE TABLE "clients"
+CREATE TABLE "customers"
 (
     "id"         uuid UNIQUE PRIMARY KEY,
     "name"       varchar(255),
@@ -34,7 +34,7 @@ CREATE TABLE "order_status"
 CREATE TABLE "orders"
 (
     "id"                    uuid UNIQUE PRIMARY KEY,
-    "id_client"             uuid references "clients" ("id"),
+    "id_customer"             uuid references "customers" ("id"),
     "status"                varchar(20) references "order_status" ("status"),
     "notification_attempts" int,
     "notified_at"           timestamptz,
