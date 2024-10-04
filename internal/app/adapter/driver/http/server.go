@@ -34,6 +34,6 @@ func (s *Server) routes() {
 
 func healthy() func(c echo.Context) error {
 	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "healthy")
+		return c.JSON(http.StatusOK, map[string]string{"message": "healthy"})
 	}
 }
