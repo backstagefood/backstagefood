@@ -27,3 +27,4 @@ cmd/app/.env
 /go.sum
 
 backstagefood
+/.env
