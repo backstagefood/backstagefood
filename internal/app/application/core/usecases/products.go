@@ -2,19 +2,20 @@ package usecases
 
 import (
 	"github.com/backstagefood/backstagefood/internal/app/domain"
+	"log/slog"
 )
 
-type ListProductsImp interface {
-	ListAll() ([]*domain.Product, error)
-	FindById(id string) ([]*domain.Product, error)
+type ProductsRepositoryImp interface {
+	ListAllProducts() ([]*domain.Product, error)
+	FindProductById(id string) (*domain.Product, error)
 }
 
-type ListProducts struct {
-	repositoryList ListProductsImp
+type ProductsRepository struct {
+	repository ProductsRepositoryImp
 }
 
-func NewListProduct(repo ListProductsImp) *ListProducts {
-	return &ListProducts{repositoryList: repo}
+func NewListProduct(repo ProductsRepositoryImp) *ProductsRepository {
+	return &ProductsRepository{repository: repo}
 }
 
 type DTO struct {
@@ -22,7 +23,8 @@ type DTO struct {
 	name string
 }
 
-func (l *ListProducts) List() ([]*DTO, error) {
-	l.repositoryList.ListAll()
+func (l *ProductsRepository) List() ([]*DTO, error) {
+	slog.Info("[products] list")
+	l.repository.ListAllProducts()
 	return []*DTO{}, nil
 }

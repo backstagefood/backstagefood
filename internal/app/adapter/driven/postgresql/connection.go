@@ -38,6 +38,34 @@ func New() *SqlDb {
 	return &SqlDb{SqlClient: client}
 }
 
-func (s *SqlDb) ListAll() ([]*domain.Product, error) {
+func (s *SqlDb) ListAllProducts() ([]*domain.Product, error) {
+	statement := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products"
+	rows, err := s.SqlClient.Query(statement)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	products := make([]domain.Product, 0)
+	for rows.Next() {
+		var product domain.Product
+		if err := rows.Scan(&product.ID, &product.IDCategory, &product.Description, &product.Ingredients, &product.Price, &product.CreatedAt, &product.UpdatedAt); err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
 	return []*domain.Product{}, nil
+}
+
+func (s *SqlDb) FindProductById(id string) (*domain.Product, error) {
+	stmt, err := s.SqlClient.Prepare("SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products WHERE id = $1")
+	defer stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	var product domain.Product
+	err = stmt.QueryRow(id).Scan(&product.ID, &product.IDCategory, &product.Description, &product.Ingredients, &product.Price, &product.CreatedAt, &product.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &product, nil
 }

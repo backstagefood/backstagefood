@@ -24,6 +24,6 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	server := server.New(e, db)
-	server.Start(os.Getenv("SERVER_PORT"))
+	s := server.New(e, db)
+	s.Start(os.Getenv("SERVER_PORT"))
 }
