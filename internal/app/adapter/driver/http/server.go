@@ -52,7 +52,7 @@ func ListAllProducts(db *database.SqlDb) func(c echo.Context) error {
 		uc := usecases.NewProducts(db)
 		products, err := uc.GetProducts()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 
 		slog.Info("[server] list all products")

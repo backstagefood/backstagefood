@@ -40,7 +40,7 @@ func (p *ProductsRepository) GetProductById(id string) (*DTO, error) {
 func (p *ProductsRepository) GetProducts() ([]*DTO, error) {
 	slog.Info("[products] list")
 	productList, err := p.repository.ListAllProducts()
-	if err != nil {
+	if err != nil || len(productList) == 0 {
 		return []*DTO{}, fmt.Errorf("produtos não foram encontrado")
 	}
 
