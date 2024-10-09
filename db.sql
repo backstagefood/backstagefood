@@ -58,5 +58,5 @@ CREATE TABLE "users"
 -- insere registros de testes
 INSERT INTO product_categories values('83a7f6c5-b717-4159-b2b2-675bccb5cd81', 'bebidas');
 INSERT INTO public.products (id, id_category, description, ingredients, price, created_at, updated_at)
-VALUES(gen_random_uuid(), '83a7f6c5-b717-4159-b2b2-675bccb5cd81', 'cerveja', 'agua, malte, lupulo e levedura', 10.0, now(), now()),
-      (gen_random_uuid(), '83a7f6c5-b717-4159-b2b2-675bccb5cd81', 'coca-cola', '?', 9.0, now(), now());
+VALUES(gen_random_uuid(), '83a7f6c5-b717-4159-b2b2-675bccb5cd81', 'cerveja', 'agua, malte, lupulo e levedura', 10.99, now(), now()),
+      (gen_random_uuid(), '83a7f6c5-b717-4159-b2b2-675bccb5cd81', 'coca-cola', '?', 9.75, now(), now());

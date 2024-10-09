@@ -1,8 +1,6 @@
 package server
 
 import (
-	"fmt"
-	"log/slog"
 	"net/http"
 
 	database "github.com/backstagefood/backstagefood/internal/app/adapter/driven/postgresql"
@@ -49,13 +47,12 @@ func health(d *database.SqlDb) func(c echo.Context) error {
 
 func ListAllProducts(db *database.SqlDb) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		uc := usecases.NewProducts(db)
+		//TODO include query parameters  to filter the list
+		uc := usecases.NewProductsRepository(db)
 		products, err := uc.GetProducts()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
-
-		slog.Info("[server] list all products")
 		return c.JSON(http.StatusOK, products)
 	}
 }
@@ -63,14 +60,11 @@ func ListAllProducts(db *database.SqlDb) func(c echo.Context) error {
 func findProductById(db *database.SqlDb) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-
-		uc := usecases.NewProducts(db)
+		uc := usecases.NewProductsRepository(db)
 		product, err := uc.GetProductById(id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-
-		slog.Info(fmt.Sprintf("[server] find product by id %s", id))
 		return c.JSON(http.StatusOK, product)
 	}
 }

@@ -39,25 +39,26 @@ func New() *SqlDb {
 }
 
 func (s *SqlDb) ListAllProducts() ([]*domain.Product, error) {
-	statement := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products"
-	rows, err := s.SqlClient.Query(statement)
+	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products"
+	rows, err := s.SqlClient.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	products := make([]domain.Product, 0)
+	products := make([]*domain.Product, 0)
 	for rows.Next() {
 		var product domain.Product
 		if err := rows.Scan(&product.ID, &product.IDCategory, &product.Description, &product.Ingredients, &product.Price, &product.CreatedAt, &product.UpdatedAt); err != nil {
 			return nil, err
 		}
-		products = append(products, product)
+		products = append(products, &product)
 	}
-	return []*domain.Product{}, nil
+	return products, nil
 }
 
 func (s *SqlDb) FindProductById(id string) (*domain.Product, error) {
-	stmt, err := s.SqlClient.Prepare("SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products WHERE id = $1")
+	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products WHERE id = $1"
+	stmt, err := s.SqlClient.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
 		return nil, err
