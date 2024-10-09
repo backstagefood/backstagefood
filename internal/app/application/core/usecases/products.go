@@ -1,8 +1,10 @@
 package usecases
 
 import (
-	"github.com/backstagefood/backstagefood/internal/app/domain"
+	"fmt"
 	"log/slog"
+
+	"github.com/backstagefood/backstagefood/internal/app/domain"
 )
 
 type ProductsRepositoryImp interface {
@@ -14,17 +16,42 @@ type ProductsRepository struct {
 	repository ProductsRepositoryImp
 }
 
-func NewListProduct(repo ProductsRepositoryImp) *ProductsRepository {
+func NewProducts(repo ProductsRepositoryImp) *ProductsRepository {
 	return &ProductsRepository{repository: repo}
 }
 
 type DTO struct {
-	id   string
-	name string
+	Id          string `json:"id"`
+	Description string `json:"description"`
 }
 
-func (l *ProductsRepository) List() ([]*DTO, error) {
+func (p *ProductsRepository) GetProductById(id string) (*DTO, error) {
+	product, err := p.repository.FindProductById(id)
+	if err != nil {
+		return nil, fmt.Errorf("produto com id: %s não encontrado", id)
+	}
+
+	return &DTO{
+		Id:          product.ID,
+		Description: product.Description,
+	}, nil
+}
+
+func (p *ProductsRepository) GetProducts() ([]*DTO, error) {
 	slog.Info("[products] list")
-	l.repository.ListAllProducts()
-	return []*DTO{}, nil
+	productList, err := p.repository.ListAllProducts()
+	if err != nil {
+		return []*DTO{}, fmt.Errorf("produtos não foram encontrado")
+	}
+
+	var output []*DTO
+	for _, product := range productList {
+		var tmpOutput DTO
+
+		tmpOutput.Id = product.ID
+		tmpOutput.Description = product.Description
+
+		output = append(output, &tmpOutput)
+	}
+	return output, nil
 }

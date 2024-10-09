@@ -1,10 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	database "github.com/backstagefood/backstagefood/internal/app/adapter/driven/postgresql"
+	"github.com/backstagefood/backstagefood/internal/app/application/core/usecases"
 	"github.com/labstack/echo/v4"
 )
 
@@ -45,26 +47,30 @@ func health(d *database.SqlDb) func(c echo.Context) error {
 	}
 }
 
-func ListAllProducts(d *database.SqlDb) func(c echo.Context) error {
+func ListAllProducts(db *database.SqlDb) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		slog.Info("[server] list all products")
-		products, err := d.ListAllProducts()
+		uc := usecases.NewProducts(db)
+		products, err := uc.GetProducts()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
+
+		slog.Info("[server] list all products")
 		return c.JSON(http.StatusOK, products)
 	}
 }
 
-func findProductById(d *database.SqlDb) func(c echo.Context) error {
+func findProductById(db *database.SqlDb) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		slog.Info("[server] find product by id %s", id)
-		product, err := d.FindProductById(id)
+
+		uc := usecases.NewProducts(db)
+		product, err := uc.GetProductById(id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 
+		slog.Info(fmt.Sprintf("[server] find product by id %s", id))
 		return c.JSON(http.StatusOK, product)
 	}
 }
