@@ -1,23 +1,29 @@
 package main
 
 import (
-	"github.com/backstagefood/backstagefood/internal/app/adapter/driven/postgresql"
-	"github.com/backstagefood/backstagefood/internal/app/adapter/driver/http"
-	"github.com/joho/godotenv"
-	"github.com/labstack/gommon/log"
+	"log"
 	"os"
+
+	database "github.com/backstagefood/backstagefood/internal/app/adapter/driven/postgresql"
+	server "github.com/backstagefood/backstagefood/internal/app/adapter/driver/http"
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 	err := godotenv.Load()
 
 	if err != nil {
-		log.Info("error loading .env file")
-		//log.Fatal("error loading .env file")
+		log.Fatal("error loading .env file")
 	}
 
-	postgresql.New()
-	server := http.New()
+	db := database.New()
 
-	server.Start(os.Getenv("SERVER_PORT"))
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	s := server.New(e, db)
+	s.Start(os.Getenv("SERVER_PORT"))
 }

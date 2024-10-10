@@ -4,5 +4,8 @@ update:
 	@go get -u ./...
 	@go mod tidy
 
-docker: 
+build: 
 	@docker build -t backstagefood:latest .
+
+up:
+	@docker compose up --build

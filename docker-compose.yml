@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   db:
     image: postgres:16-alpine
@@ -10,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=${DB_NAME}
     volumes:
-      - ./db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ${PWD}/db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
   server:
