@@ -9,3 +9,8 @@ build:
 
 up:
 	@docker compose up --build
+
+swagger:
+# install -> go install github.com/swaggo/swag/cmd/swag@latest
+# install -> go get github.com/swaggo/echo-swagger@lates
+	swag init -g cmd/app/main.go
