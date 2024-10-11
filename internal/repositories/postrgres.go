@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"database/sql"
@@ -6,15 +6,15 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/backstagefood/backstagefood/internal/app/domain"
+	"github.com/backstagefood/backstagefood/internal/domain"
 	_ "github.com/lib/pq"
 )
 
-type SqlDb struct {
+type ApplicationDatabase struct {
 	SqlClient *sql.DB
 }
 
-func New() *SqlDb {
+func New() *ApplicationDatabase {
 	connStr := fmt.Sprintf(
 		"%s://%s:%s@%s/%s?sslmode=disable",
 		os.Getenv("DB_DRIVER"),
@@ -35,10 +35,10 @@ func New() *SqlDb {
 		panic(err)
 	}
 
-	return &SqlDb{SqlClient: client}
+	return &ApplicationDatabase{SqlClient: client}
 }
 
-func (s *SqlDb) ListAllProducts() ([]*domain.Product, error) {
+func (s *ApplicationDatabase) ListProducts() ([]*domain.Product, error) {
 	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products"
 	rows, err := s.SqlClient.Query(query)
 	if err != nil {
@@ -48,7 +48,14 @@ func (s *SqlDb) ListAllProducts() ([]*domain.Product, error) {
 	products := make([]*domain.Product, 0)
 	for rows.Next() {
 		var product domain.Product
-		if err := rows.Scan(&product.ID, &product.IDCategory, &product.Description, &product.Ingredients, &product.Price, &product.CreatedAt, &product.UpdatedAt); err != nil {
+		if err := rows.Scan(
+			&product.ID,
+			&product.IDCategory,
+			&product.Description,
+			&product.Ingredients,
+			&product.Price,
+			&product.CreatedAt,
+			&product.UpdatedAt); err != nil {
 			return nil, err
 		}
 		products = append(products, &product)
@@ -56,7 +63,7 @@ func (s *SqlDb) ListAllProducts() ([]*domain.Product, error) {
 	return products, nil
 }
 
-func (s *SqlDb) FindProductById(id string) (*domain.Product, error) {
+func (s *ApplicationDatabase) FindProductById(id string) (*domain.Product, error) {
 	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products WHERE id = $1"
 	stmt, err := s.SqlClient.Prepare(query)
 	defer stmt.Close()
@@ -64,7 +71,14 @@ func (s *SqlDb) FindProductById(id string) (*domain.Product, error) {
 		return nil, err
 	}
 	var product domain.Product
-	err = stmt.QueryRow(id).Scan(&product.ID, &product.IDCategory, &product.Description, &product.Ingredients, &product.Price, &product.CreatedAt, &product.UpdatedAt)
+	err = stmt.QueryRow(id).Scan(
+		&product.ID,
+		&product.IDCategory,
+		&product.Description,
+		&product.Ingredients,
+		&product.Price,
+		&product.CreatedAt,
+		&product.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
