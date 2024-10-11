@@ -12,5 +12,6 @@ Backstage Food is an advanced restaurant order management system that empowers c
 > make
 > docker compose up -d
 
-### Linkks 
+### Links 
 - [miro dashboard](https://miro.com/app/board/uXjVKg5JFS0=/)
+- [swagger doc](http://localhost:8080/swagger/index.html)
