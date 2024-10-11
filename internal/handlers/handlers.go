@@ -5,7 +5,7 @@ import (
 
 	db "github.com/backstagefood/backstagefood/internal/repositories"
 	"github.com/backstagefood/backstagefood/internal/service"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type Handler struct {
@@ -22,6 +22,13 @@ func New(echoEngine *echo.Echo, databaseConnection *db.ApplicationDatabase) *Han
 
 // TODO: criar um DTO padrão de saída para os handlers
 
+// Health godoc
+// @Summary Health check
+// @Description Check if the server and the database are up and running.
+// @Tags health
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Router /health [get]
 func (h *Handler) Health() func(c echo.Context) error {
 	return func(c echo.Context) error {
 		databaseStatus := "UP"
@@ -32,6 +39,14 @@ func (h *Handler) Health() func(c echo.Context) error {
 	}
 }
 
+// ListAllProducts godoc
+// @Summary List all products
+// @Description Get all products available in the database.
+// @Tags products
+// @Produce json
+// @Success 200 {array} domain.Product
+// @Failure 500 {object} map[string]string
+// @Router /products [get]
 func (h *Handler) ListAllProducts() func(c echo.Context) error {
 	return func(c echo.Context) error {
 		//TODO include query parameters to filter the list
@@ -44,6 +59,15 @@ func (h *Handler) ListAllProducts() func(c echo.Context) error {
 	}
 }
 
+// FindProductById godoc
+// @Summary Find product by ID
+// @Description Get a specific product by its ID.
+// @Tags products
+// @Produce json
+// @Param id path string true "Product ID"
+// @Success 200 {object} domain.Product
+// @Failure 500 {object} map[string]string
+// @Router /products/{id} [get]
 func (h *Handler) FindProductById() func(c echo.Context) error {
 	return func(c echo.Context) error {
 		id := c.Param("id")

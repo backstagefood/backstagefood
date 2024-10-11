@@ -2,6 +2,7 @@ package domain
 
 import "time"
 
+// Product represents a product in the system
 type Product struct {
 	ID              string          `json:"id"`
 	IDCategory      string          `json:"id_category"`
