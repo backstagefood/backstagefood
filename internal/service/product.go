@@ -1,17 +1,18 @@
-package usecases
+package service
 
 import (
 	"fmt"
-	"github.com/backstagefood/backstagefood/internal/app/domain"
+
+	"github.com/backstagefood/backstagefood/internal/domain"
 )
 
-type ProductsRepositoryImp interface {
-	ListAllProducts() ([]*domain.Product, error)
+type ProductInterface interface {
+	ListProducts() ([]*domain.Product, error)
 	FindProductById(id string) (*domain.Product, error)
 }
 
-type ProductsRepository struct {
-	repository ProductsRepositoryImp
+type ProductService struct {
+	productRepository ProductInterface
 }
 
 type ProductDTO struct {
@@ -21,15 +22,16 @@ type ProductDTO struct {
 	Price       float64 `json:"price"`
 }
 
-func NewProductsRepository(repository ProductsRepositoryImp) *ProductsRepository {
-	return &ProductsRepository{repository: repository}
+func NewProductService(repository ProductInterface) *ProductService {
+	return &ProductService{productRepository: repository}
 }
 
-func (p *ProductsRepository) GetProductById(id string) (*ProductDTO, error) {
-	product, err := p.repository.FindProductById(id)
+func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
+	product, err := p.productRepository.FindProductById(id)
 	if err != nil {
 		return nil, fmt.Errorf("product with id: %s not found", id)
 	}
+
 	return &ProductDTO{
 		Id:          product.ID,
 		Description: product.Description,
@@ -38,11 +40,12 @@ func (p *ProductsRepository) GetProductById(id string) (*ProductDTO, error) {
 	}, nil
 }
 
-func (p *ProductsRepository) GetProducts() ([]*ProductDTO, error) {
-	productList, err := p.repository.ListAllProducts()
+func (p *ProductService) GetProducts() ([]*ProductDTO, error) {
+	productList, err := p.productRepository.ListProducts()
 	if err != nil {
 		return []*ProductDTO{}, fmt.Errorf("products not found")
 	}
+
 	var output []*ProductDTO
 	for _, product := range productList {
 		output = append(output, &ProductDTO{
