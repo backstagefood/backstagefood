@@ -91,6 +91,26 @@
 							}
 			},
 			"response": []
+		},
+		{
+			"name": "/checkout/orderId",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/checkout/109186d7-7b46-4c67-863e-70a08b1e7315",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"checkout",
+						"109186d7-7b46-4c67-863e-70a08b1e7315"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
