@@ -23,6 +23,53 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/checkout/{orderId}": {
+            "post": {
+                "description": "If payment succeeded then update order status.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "checkout"
+                ],
+                "summary": "Checkout ensure the payment is succeeded.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "orderId",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/service.CheckoutServiceDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "Check if the server and the database are up and running.",
@@ -118,6 +165,45 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.Order": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "id_customer": {
+                    "type": "string"
+                },
+                "notification_attempts": {
+                    "type": "integer"
+                },
+                "notified_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.OrderStatus": {
+            "type": "string",
+            "enum": [
+                "PENDING",
+                "RECEIVED",
+                "PAYMENT_FAILED"
+            ],
+            "x-enum-varnames": [
+                "PENDING",
+                "RECEIVED",
+                "PAYMENT_FAILED"
+            ]
+        },
         "domain.Product": {
             "type": "object",
             "properties": {
@@ -157,6 +243,20 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "service.CheckoutServiceDTO": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "$ref": "#/definitions/domain.Order"
+                },
+                "orderStatus": {
+                    "$ref": "#/definitions/domain.OrderStatus"
+                },
+                "paymentSucceeded": {
+                    "type": "boolean"
+                }
+            }
         }
     }
 }`
@@ -164,7 +264,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:1323",
+	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Backstage Food API",
