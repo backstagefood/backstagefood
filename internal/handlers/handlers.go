@@ -5,6 +5,7 @@ import (
 
 	db "github.com/backstagefood/backstagefood/internal/repositories"
 	"github.com/backstagefood/backstagefood/internal/service"
+	"github.com/backstagefood/backstagefood/pkg/transaction"
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,7 +33,7 @@ func New(echoEngine *echo.Echo, databaseConnection *db.ApplicationDatabase) *Han
 func (h *Handler) Health() func(c echo.Context) error {
 	return func(c echo.Context) error {
 		databaseStatus := "UP"
-		if err := h.database.SqlClient.Ping(); err != nil {
+		if err := h.database.DataBaseHeatlh(); err != nil {
 			databaseStatus = "DOWN"
 		}
 		return c.JSON(http.StatusOK, map[string]string{"status": "UP", "database": databaseStatus})
@@ -79,6 +80,33 @@ func (h *Handler) FindProductById() func(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, product)
 	}
+}
+
+// Checkout godoc
+// @Summary Checkout ensure the payment is succeeded.
+// @Description If payment succeeded then update order status.
+// @Tags checkout
+// @Produce json
+// @Param orderId path string true "orderId"
+// @Success 201 {object} service.CheckoutServiceDTO
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /checkout/{orderId} [post]
+func (h *Handler) Checkout(c echo.Context) error {
+	orderId := c.Param("orderId")
+	if orderId == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "order id maybe not exist"})
+	}
+
+	transactionManager := transaction.New(h.database.Client())
+
+	service := service.NewCheckout(h.database, orderId, transactionManager)
+	result, err := service.MakeCheckout()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, result)
 }
 
 // CreateProduct godoc

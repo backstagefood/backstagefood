@@ -12,11 +12,18 @@ services:
       - ${PWD}/db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d backstage -U backstage"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+  
   server:
     build:
       context: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: always
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
@@ -24,6 +31,7 @@ services:
       - internal
     volumes:
       - ${PWD}/.env:/app/.env
+
 networks:
   internal:
     driver: bridge
