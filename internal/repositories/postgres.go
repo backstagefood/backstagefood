@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/backstagefood/backstagefood/internal/domain"
 	_ "github.com/lib/pq"
@@ -38,9 +39,15 @@ func New() *ApplicationDatabase {
 	return &ApplicationDatabase{SqlClient: client}
 }
 
-func (s *ApplicationDatabase) ListProducts() ([]*domain.Product, error) {
-	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products"
-	rows, err := s.SqlClient.Query(query)
+func (s *ApplicationDatabase) ListProducts(description string) ([]*domain.Product, error) {
+	//query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category  = b.id AND LOWER(description)  LIKE '%' || $1 || '%'"
+	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at FROM products a where LOWER(description)  LIKE '%' || $1 || '%'"
+	stmt, err := s.SqlClient.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(strings.ToLower(description))
 	if err != nil {
 		return nil, err
 	}

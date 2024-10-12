@@ -49,9 +49,9 @@ func (h *Handler) Health() func(c echo.Context) error {
 // @Router /products [get]
 func (h *Handler) ListAllProducts() func(c echo.Context) error {
 	return func(c echo.Context) error {
-		//TODO include query parameters to filter the list
+		description := c.QueryParam("description")
 		uc := service.NewProductService(h.database)
-		products, err := uc.GetProducts()
+		products, err := uc.GetProducts(description)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}

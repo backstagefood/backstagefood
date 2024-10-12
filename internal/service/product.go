@@ -8,7 +8,7 @@ import (
 )
 
 type ProductInterface interface {
-	ListProducts() ([]*domain.Product, error)
+	ListProducts(description string) ([]*domain.Product, error)
 	FindProductById(id string) (*domain.Product, error)
 	CreateProduct(product *domain.Product) (*domain.Product, error)
 	GetCategoryID(categoryName string) (string, error)
@@ -44,8 +44,8 @@ func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 	}, nil
 }
 
-func (p *ProductService) GetProducts() ([]*ProductDTO, error) {
-	productList, err := p.productRepository.ListProducts()
+func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) {
+	productList, err := p.productRepository.ListProducts(description)
 	if err != nil {
 		return []*ProductDTO{}, fmt.Errorf("products not found")
 	}
