@@ -34,6 +34,7 @@ func (s *Routes) routes(handlers *handlers.Handler) {
 	s.echoEngine.GET("/health", handlers.Health())
 	s.echoEngine.GET("/products", handlers.ListAllProducts())
 	s.echoEngine.GET("/products/:id", handlers.FindProductById())
+	s.echoEngine.POST("/checkout/:orderId", handlers.Checkout)
 
 	s.echoEngine.GET("/swagger/*", echoSwagger.WrapHandler)
 }
