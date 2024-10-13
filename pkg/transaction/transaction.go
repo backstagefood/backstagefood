@@ -24,7 +24,7 @@ func (m *SqlTransactionManager) RunWithTransaction(callback func() (interface{},
 	if err != nil {
 		tx.Rollback()
 		slog.Info("[*] rollback executed")
-		return nil, err
+		return callbackResponse, err
 	}
 
 	tx.Commit()

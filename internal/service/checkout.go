@@ -50,7 +50,7 @@ func (c *CheckoutService) MakeCheckout() (*CheckoutServiceDTO, error) {
 				Order:            updatedOrder,
 			}, fmt.Errorf("order still pending")
 		}
-		
+
 		// TODO: FakeCheckout() need to be interfaced when the real web hook is implemented.
 		paymentGatewayResponse := paymentgateway.PaymentCheckout()
 		if paymentGatewayResponse != http.StatusOK {
@@ -60,7 +60,6 @@ func (c *CheckoutService) MakeCheckout() (*CheckoutServiceDTO, error) {
 			}, fmt.Errorf("payment failed")
 		}
 
-
 		return &CheckoutServiceDTO{
 			PaymentSucceeded: true,
 			OrderStatus:      domain.RECEIVED,
@@ -68,6 +67,5 @@ func (c *CheckoutService) MakeCheckout() (*CheckoutServiceDTO, error) {
 		}, nil
 	})
 
-	result := transactionResult.(CheckoutServiceDTO)
-	return &result, err
+	return transactionResult.(*CheckoutServiceDTO), err
 }
