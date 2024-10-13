@@ -5,6 +5,7 @@ import (
 
 	db "github.com/backstagefood/backstagefood/internal/repositories"
 	"github.com/backstagefood/backstagefood/internal/service"
+	"github.com/backstagefood/backstagefood/pkg/transaction"
 	"github.com/labstack/echo/v4"
 )
 
@@ -96,7 +97,9 @@ func (h *Handler) Checkout(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "order id maybe not exist"})
 	}
 
-	service := service.NewCheckout(h.database, orderId)
+	transactionManager := transaction.New(h.database.Client())
+
+	service := service.NewCheckout(h.database, orderId, transactionManager)
 	result, err := service.MakeCheckout()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})

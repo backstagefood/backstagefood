@@ -31,6 +31,7 @@ services:
       - internal
     volumes:
       - ${PWD}/.env:/app/.env
+
 networks:
   internal:
     driver: bridge
