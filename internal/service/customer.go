@@ -1,11 +1,49 @@
 package service
 
-type CustomerInterface interface {
-}
+import (
+	"github.com/backstagefood/backstagefood/internal/domain"
+	"github.com/backstagefood/backstagefood/internal/repositories"
+	"github.com/google/uuid"
+	"time"
+)
 
 type CustomerService struct {
-	customerRepository CustomerInterface
+	customerRepository repositories.CustomerRepository
 }
 
-type CustomerDTO struct {
+type SignUpCustomerDTO struct {
+	Name  string `json:"name"`
+	CPF   string `json:"cpf"`
+	Email string `json:"email"`
+}
+
+func (customerDTO *SignUpCustomerDTO) toDomainCustomer() *domain.Customer {
+	return &domain.Customer{
+		ID:        uuid.New().String(),
+		Name:      customerDTO.Name,
+		CPF:       customerDTO.CPF,
+		Email:     customerDTO.Email,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+}
+
+func NewCustomerService(repository repositories.CustomerRepository) *CustomerService {
+	return &CustomerService{customerRepository: repository}
+}
+
+func (c *CustomerService) SignUp(customerDTO *SignUpCustomerDTO) (*domain.Customer, error) {
+	if customerDTO.CPF == "" {
+		return nil, domain.ErrCPFIsRequired
+	}
+
+	return c.customerRepository.SignUp(customerDTO.toDomainCustomer())
+}
+
+func (c *CustomerService) Identify(cpf string) (*domain.Customer, error) {
+	if cpf == "" {
+		return nil, domain.ErrCPFIsRequired
+	}
+
+	return c.customerRepository.Identify(cpf)
 }
