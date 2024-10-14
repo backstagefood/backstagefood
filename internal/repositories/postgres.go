@@ -3,12 +3,10 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log/slog"
-	"os"
-	"strings"
-
 	"github.com/backstagefood/backstagefood/internal/domain"
 	_ "github.com/lib/pq"
+	"log/slog"
+	"os"
 )
 
 type ApplicationDatabase struct {
@@ -40,13 +38,13 @@ func New() *ApplicationDatabase {
 }
 
 func (s *ApplicationDatabase) ListProducts(description string) ([]*domain.Product, error) {
-	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category = b.id AND LOWER(a.description)  LIKE '%' || $1 || '%'"
+	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category = b.id AND a.description ILIKE '%' || $1 || '%'"
 	stmt, err := s.SqlClient.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query(strings.ToLower(description))
+	rows, err := stmt.Query(description)
 	if err != nil {
 		return nil, err
 	}
