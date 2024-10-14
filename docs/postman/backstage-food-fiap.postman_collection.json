@@ -63,6 +63,34 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "products",
+			"request": {
+							"method": "POST",
+							"header": [],
+							"body": {
+											"mode": "raw",
+											"raw": "{\n    \"description\": \"Zoiudo\",\n    \"ingredients\": \"Pão com Ovo\",\n    \"price\": 11.99,\n    \"category\": \"Lanche\"\n}\n",
+											"options": {
+															"raw": {
+																			"language": "json"
+															}
+											}
+							},
+							"url": {
+											"raw": "http://localhost:8080/products",
+											"protocol": "http",
+											"host": [
+															"localhost"
+											],
+											"port": "8080",
+											"path": [
+															"products"
+											]
+							}
+			},
+			"response": []
 		}
 	]
 }
