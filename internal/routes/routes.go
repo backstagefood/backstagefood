@@ -20,8 +20,13 @@ func New(echoEngine *echo.Echo) *Routes {
 }
 
 func (s *Routes) Start(port string, databaseConnection *db.ApplicationDatabase) {
-	handlers := handlers.New(s.echoEngine, databaseConnection)
-	s.routes(handlers)
+	defaultHandlers := handlers.New(s.echoEngine, databaseConnection)
+	customerHandler := handlers.NewCustomerHandler(databaseConnection)
+
+	s.routes(
+		defaultHandlers,
+		customerHandler,
+	)
 
 	err := s.echoEngine.Start(":" + port)
 	if err != nil {
@@ -30,10 +35,13 @@ func (s *Routes) Start(port string, databaseConnection *db.ApplicationDatabase) 
 	}
 }
 
-func (s *Routes) routes(handlers *handlers.Handler) {
-	s.echoEngine.GET("/health", handlers.Health())
-	s.echoEngine.GET("/products", handlers.ListAllProducts())
-	s.echoEngine.GET("/products/:id", handlers.FindProductById())
+func (s *Routes) routes(defaultHandlers *handlers.Handler, customerHandler *handlers.CustomerHandler) {
+	s.echoEngine.GET("/health", defaultHandlers.Health())
+	s.echoEngine.GET("/products", defaultHandlers.ListAllProducts())
+	s.echoEngine.GET("/products/:id", defaultHandlers.FindProductById())
+
+	s.echoEngine.POST("/customers/sign-up", customerHandler.CustomerSignUp)
+	s.echoEngine.GET("/customers/:cpf", customerHandler.CustomerIdentify)
 
 	s.echoEngine.GET("/swagger/*", echoSwagger.WrapHandler)
 }

@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  domain.Customer:
+    properties:
+      cpf:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
   domain.Product:
     properties:
       created_at:
@@ -26,7 +41,16 @@ definitions:
       id:
         type: string
     type: object
-host: localhost:1323
+  service.SignUpCustomerDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact:
     email: support@swagger.io
@@ -39,6 +63,63 @@ info:
   title: Backstage Food API
   version: "1.0"
 paths:
+  /customers/{cpf}:
+    get:
+      description: Identify a customer.
+      parameters:
+      - description: Customer CPF
+        in: path
+        name: cpf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Customer'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Customer identification
+      tags:
+      - customers
+  /customers/sign-up:
+    post:
+      description: Create a customer.
+      parameters:
+      - description: SignUpCustomerDTO object
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/service.SignUpCustomerDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Customer sign up
+      tags:
+      - customers
   /health:
     get:
       description: Check if the server and the database are up and running.

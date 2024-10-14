@@ -1,4 +1,4 @@
-all: update docker 
+all: update up
 
 update: 
 	@go get -u ./...
@@ -12,5 +12,5 @@ up:
 
 swagger:
 # install -> go install github.com/swaggo/swag/cmd/swag@latest
-# install -> go get github.com/swaggo/echo-swagger@lates
+# install -> go get github.com/swaggo/echo-swagger@latest
 	swag init -g cmd/app/main.go
