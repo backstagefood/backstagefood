@@ -56,6 +56,14 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "List all products",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Descripion",
+                        "name": "description",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

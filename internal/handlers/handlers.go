@@ -44,6 +44,7 @@ func (h *Handler) Health() func(c echo.Context) error {
 // @Description Get all products available in the database.
 // @Tags products
 // @Produce json
+// @Param description query string false "Descripion"
 // @Success 200 {array} domain.Product
 // @Failure 500 {object} map[string]string
 // @Router /products [get]

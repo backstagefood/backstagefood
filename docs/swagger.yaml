@@ -57,6 +57,11 @@ paths:
   /products:
     get:
       description: Get all products available in the database.
+      parameters:
+      - description: Descripion
+        in: query
+        name: description
+        type: string
       produces:
       - application/json
       responses:

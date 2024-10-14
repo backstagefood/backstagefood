@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/backstagefood/backstagefood/internal/domain"
 	"github.com/google/uuid"
@@ -23,6 +24,7 @@ type ProductDTO struct {
 	Description string  `json:"description"`
 	Ingredients string  `json:"ingredients"`
 	Price       float64 `json:"price"`
+	Category    string  `json:"category"`
 	IDCategory  string  `json:"category_id"`
 }
 
@@ -33,6 +35,7 @@ func NewProductService(repository ProductInterface) *ProductService {
 func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 	product, err := p.productRepository.FindProductById(id)
 	if err != nil {
+		slog.Error("error:", err)
 		return nil, fmt.Errorf("product with id: %s not found", id)
 	}
 
@@ -41,12 +44,14 @@ func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 		Description: product.Description,
 		Ingredients: product.Ingredients,
 		Price:       product.Price,
+		Category:    product.ProductCategory.Description,
 	}, nil
 }
 
 func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) {
 	productList, err := p.productRepository.ListProducts(description)
 	if err != nil {
+		slog.Error("error:", err)
 		return []*ProductDTO{}, fmt.Errorf("products not found")
 	}
 
@@ -57,6 +62,7 @@ func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) 
 			Description: product.Description,
 			Ingredients: product.Ingredients,
 			Price:       product.Price,
+			Category:    product.ProductCategory.Description,
 		})
 	}
 	return output, nil
