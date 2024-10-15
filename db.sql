@@ -61,12 +61,12 @@ CREATE TABLE "users"
 
 -- insert order_status
 INSERT INTO public.order_status VALUES
-    ('Pending', 'Order has been created but not processed yet'),
-    ('Received', 'Order has been received and is ready to prepare'),
-    ('InPreparation', 'Order is currently being prepared'),
-    ('Ready', 'Order is ready for pickup or delivery'),
-    ('Completed', 'Order has been completed and delivered'),
-    ('Cancelled', 'Order has been cancelled');
+    ('PENDING', 'Order has been created but not processed yet'),
+    ('RECEIVED', 'Order has been received and is ready to prepare'),
+    ('IN_PREPARATION', 'Order is currently being prepared'),
+    ('READY', 'Order is ready for pickup or delivery'),
+    ('COMPLETED', 'Order has been completed and delivered'),
+    ('CANCELLED', 'Order has been cancelled');
 
 -- insert customers
 INSERT INTO public.customers VALUES
@@ -95,7 +95,7 @@ INSERT INTO public.products (id, id_category, description, ingredients, price, c
 
 -- insert orders
 INSERT INTO public.orders VALUES
-    ('109186d7-7b46-4c67-863e-70a08b1e7315', '3bf11979-6b27-495c-a604-1e9db32a86bd', 'Pending', 0, now(), now(), now());
+    ('109186d7-7b46-4c67-863e-70a08b1e7315', '3bf11979-6b27-495c-a604-1e9db32a86bd', 'PENDING', 0, now(), now(), now());
 
 -- insert order_products
 INSERT INTO public.order_products VALUES

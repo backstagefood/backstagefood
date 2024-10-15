@@ -1,11 +1,16 @@
 package service
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/backstagefood/backstagefood/internal/domain"
 	paymentgateway "github.com/backstagefood/backstagefood/internal/service/payment_gateway"
+)
+
+var (
+	error_order_pending  = errors.New("order still pending")
+	error_payment_failed = errors.New("payment failed")
 )
 
 type OrderInterface interface {
@@ -48,7 +53,7 @@ func (c *CheckoutService) MakeCheckout() (*CheckoutServiceDTO, error) {
 				PaymentSucceeded: true,
 				OrderStatus:      domain.PENDING,
 				Order:            updatedOrder,
-			}, fmt.Errorf("order still pending")
+			}, error_order_pending
 		}
 
 		// TODO: FakeCheckout() need to be interfaced when the real web hook is implemented.
@@ -57,7 +62,7 @@ func (c *CheckoutService) MakeCheckout() (*CheckoutServiceDTO, error) {
 			return &CheckoutServiceDTO{
 				PaymentSucceeded: false,
 				OrderStatus:      domain.PAYMENT_FAILED,
-			}, fmt.Errorf("payment failed")
+			}, error_payment_failed
 		}
 
 		return &CheckoutServiceDTO{
