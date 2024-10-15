@@ -24,8 +24,8 @@ type ProductDTO struct {
 	Description string  `json:"description"`
 	Ingredients string  `json:"ingredients"`
 	Price       float64 `json:"price"`
-	Category    string  `json:"category"`
 	IDCategory  string  `json:"category_id"`
+	Category    string  `json:"category"`
 }
 
 func NewProductService(repository ProductInterface) *ProductService {
@@ -44,6 +44,7 @@ func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 		Description: product.Description,
 		Ingredients: product.Ingredients,
 		Price:       product.Price,
+		IDCategory:  product.ProductCategory.ID,
 		Category:    product.ProductCategory.Description,
 	}, nil
 }
@@ -62,6 +63,7 @@ func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) 
 			Description: product.Description,
 			Ingredients: product.Ingredients,
 			Price:       product.Price,
+			IDCategory:  product.ProductCategory.ID,
 			Category:    product.ProductCategory.Description,
 		})
 	}
