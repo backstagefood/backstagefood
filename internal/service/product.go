@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/backstagefood/backstagefood/internal/domain"
+	"github.com/google/uuid"
 )
 
 type ProductInterface interface {
 	ListProducts() ([]*domain.Product, error)
 	FindProductById(id string) (*domain.Product, error)
+	CreateProduct(product *domain.Product) (*domain.Product, error)
+	GetCategoryID(categoryName string) (string, error)
 }
 
 type ProductService struct {
@@ -20,6 +23,7 @@ type ProductDTO struct {
 	Description string  `json:"description"`
 	Ingredients string  `json:"ingredients"`
 	Price       float64 `json:"price"`
+	IDCategory  string  `json:"category_id"`
 }
 
 func NewProductService(repository ProductInterface) *ProductService {
@@ -56,4 +60,41 @@ func (p *ProductService) GetProducts() ([]*ProductDTO, error) {
 		})
 	}
 	return output, nil
+}
+
+func (p *ProductService) CreateProduct(productDTO *ProductDTO) (*ProductDTO, error) {
+	productToCreate := &domain.Product{
+		ID:          uuid.New().String(),
+		IDCategory:  productDTO.IDCategory,
+		Description: productDTO.Description,
+		Ingredients: productDTO.Ingredients,
+		Price:       productDTO.Price,
+		CreatedAt:   domain.GetNow(),
+		UpdatedAt:   domain.GetNow(),
+	}
+
+	//Validate Product
+	if err := domain.ValidateProduct(productToCreate); err != nil {
+		return nil, err
+	}
+
+	createdProduct, err := p.productRepository.CreateProduct(productToCreate)
+	if err != nil {
+		return nil, fmt.Errorf("error creating product")
+	}
+
+	return &ProductDTO{
+		Id:          createdProduct.ID,
+		Description: createdProduct.Description,
+		Ingredients: createdProduct.Ingredients,
+		Price:       createdProduct.Price,
+	}, nil
+}
+
+func (p *ProductService) GetCategoryID(categoryName string) (string, error) {
+	categoryID, err := p.productRepository.GetCategoryID(categoryName)
+	if err != nil {
+		return "", fmt.Errorf("category not found")
+	}
+	return categoryID, nil
 }

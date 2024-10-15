@@ -84,3 +84,41 @@ func (s *ApplicationDatabase) FindProductById(id string) (*domain.Product, error
 	}
 	return &product, nil
 }
+
+func (s *ApplicationDatabase) CreateProduct(product *domain.Product) (*domain.Product, error) {
+	query := "INSERT INTO products (id, id_category, description, ingredients, created_at, updated_at, price) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
+	stmt, err := s.SqlClient.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	err = stmt.QueryRow(
+		product.ID,
+		product.IDCategory,
+		product.Description,
+		product.Ingredients,
+		product.CreatedAt,
+		product.UpdatedAt,
+		product.Price).Scan(&product.ID)
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
+}
+
+// Get CategoryID returns the category ID based on the category name
+func (s *ApplicationDatabase) GetCategoryID(categoryDescription string) (string, error) {
+	query := "SELECT id FROM product_categories WHERE description = $1"
+	stmt, err := s.SqlClient.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return "", err
+	}
+	var categoryID string
+	err = stmt.QueryRow(categoryDescription).Scan(&categoryID)
+	if err != nil {
+		return "", err
+	}
+	return categoryID, nil
+}

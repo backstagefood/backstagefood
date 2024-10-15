@@ -79,3 +79,34 @@ func (h *Handler) FindProductById() func(c echo.Context) error {
 		return c.JSON(http.StatusOK, product)
 	}
 }
+
+// CreateProduct godoc
+// @Summary Create a new product
+// @Description Create a new product in the database.
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param product body domain.Product true "Product object"
+// @Success 201 {object} domain.Product
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /products [post]
+func (h *Handler) CreateProduct() func(c echo.Context) error {
+	return func(c echo.Context) error {
+		productDTO := new(service.ProductDTO)
+		if err := c.Bind(productDTO); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		uc := service.NewProductService(h.database)
+		category, err := uc.GetCategoryID(c.Param("category"))
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		productDTO.IDCategory = category
+		createdProduct, err := uc.CreateProduct(productDTO)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusCreated, createdProduct)
+	}
+}
