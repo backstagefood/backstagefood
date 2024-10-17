@@ -3,11 +3,10 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log/slog"
-	"os"
-
 	"github.com/backstagefood/backstagefood/internal/domain"
 	_ "github.com/lib/pq"
+	"log/slog"
+	"os"
 )
 
 type ApplicationDatabase struct {
@@ -38,9 +37,14 @@ func New() *ApplicationDatabase {
 	return &ApplicationDatabase{SqlClient: client}
 }
 
-func (s *ApplicationDatabase) ListProducts() ([]*domain.Product, error) {
-	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products"
-	rows, err := s.SqlClient.Query(query)
+func (s *ApplicationDatabase) ListProducts(description string) ([]*domain.Product, error) {
+	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category = b.id AND a.description ILIKE '%' || $1 || '%'"
+	stmt, err := s.SqlClient.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(description)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +59,9 @@ func (s *ApplicationDatabase) ListProducts() ([]*domain.Product, error) {
 			&product.Ingredients,
 			&product.Price,
 			&product.CreatedAt,
-			&product.UpdatedAt); err != nil {
+			&product.UpdatedAt,
+			&product.ProductCategory.ID,
+			&product.ProductCategory.Description); err != nil {
 			return nil, err
 		}
 		products = append(products, &product)
@@ -64,7 +70,7 @@ func (s *ApplicationDatabase) ListProducts() ([]*domain.Product, error) {
 }
 
 func (s *ApplicationDatabase) FindProductById(id string) (*domain.Product, error) {
-	query := "SELECT id, id_category, description, ingredients, price, created_at, updated_at FROM products WHERE id = $1"
+	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category = b.id AND a.id = $1"
 	stmt, err := s.SqlClient.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
@@ -78,7 +84,9 @@ func (s *ApplicationDatabase) FindProductById(id string) (*domain.Product, error
 		&product.Ingredients,
 		&product.Price,
 		&product.CreatedAt,
-		&product.UpdatedAt)
+		&product.UpdatedAt,
+		&product.ProductCategory.ID,
+		&product.ProductCategory.Description)
 	if err != nil {
 		return nil, err
 	}

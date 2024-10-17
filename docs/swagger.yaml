@@ -26,7 +26,7 @@ definitions:
       id:
         type: string
     type: object
-host: localhost:1323
+host: localhost:8080
 info:
   contact:
     email: support@swagger.io
@@ -57,6 +57,11 @@ paths:
   /products:
     get:
       description: Get all products available in the database.
+      parameters:
+      - description: Descripion
+        in: query
+        name: description
+        type: string
       produces:
       - application/json
       responses:
@@ -73,6 +78,39 @@ paths:
               type: string
             type: object
       summary: List all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product in the database.
+      parameters:
+      - description: Product object
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new product
       tags:
       - products
   /products/{id}:

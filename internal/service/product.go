@@ -2,13 +2,14 @@ package service
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/backstagefood/backstagefood/internal/domain"
 	"github.com/google/uuid"
 )
 
 type ProductInterface interface {
-	ListProducts() ([]*domain.Product, error)
+	ListProducts(description string) ([]*domain.Product, error)
 	FindProductById(id string) (*domain.Product, error)
 	CreateProduct(product *domain.Product) (*domain.Product, error)
 	GetCategoryID(categoryName string) (string, error)
@@ -24,6 +25,7 @@ type ProductDTO struct {
 	Ingredients string  `json:"ingredients"`
 	Price       float64 `json:"price"`
 	IDCategory  string  `json:"category_id"`
+	Category    string  `json:"category"`
 }
 
 func NewProductService(repository ProductInterface) *ProductService {
@@ -33,6 +35,7 @@ func NewProductService(repository ProductInterface) *ProductService {
 func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 	product, err := p.productRepository.FindProductById(id)
 	if err != nil {
+		slog.Error("error:", err)
 		return nil, fmt.Errorf("product with id: %s not found", id)
 	}
 
@@ -41,12 +44,15 @@ func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 		Description: product.Description,
 		Ingredients: product.Ingredients,
 		Price:       product.Price,
+		IDCategory:  product.ProductCategory.ID,
+		Category:    product.ProductCategory.Description,
 	}, nil
 }
 
-func (p *ProductService) GetProducts() ([]*ProductDTO, error) {
-	productList, err := p.productRepository.ListProducts()
+func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) {
+	productList, err := p.productRepository.ListProducts(description)
 	if err != nil {
+		slog.Error("error:", err)
 		return []*ProductDTO{}, fmt.Errorf("products not found")
 	}
 
@@ -57,6 +63,8 @@ func (p *ProductService) GetProducts() ([]*ProductDTO, error) {
 			Description: product.Description,
 			Ingredients: product.Ingredients,
 			Price:       product.Price,
+			IDCategory:  product.ProductCategory.ID,
+			Category:    product.ProductCategory.Description,
 		})
 	}
 	return output, nil

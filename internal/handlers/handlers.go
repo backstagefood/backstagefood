@@ -44,14 +44,15 @@ func (h *Handler) Health() func(c echo.Context) error {
 // @Description Get all products available in the database.
 // @Tags products
 // @Produce json
+// @Param description query string false "Descripion"
 // @Success 200 {array} domain.Product
 // @Failure 500 {object} map[string]string
 // @Router /products [get]
 func (h *Handler) ListAllProducts() func(c echo.Context) error {
 	return func(c echo.Context) error {
-		//TODO include query parameters to filter the list
+		description := c.QueryParam("description")
 		uc := service.NewProductService(h.database)
-		products, err := uc.GetProducts()
+		products, err := uc.GetProducts(description)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
