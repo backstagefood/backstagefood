@@ -25,7 +25,7 @@ func NewCustomerHandler(databaseConnection *repositories.ApplicationDatabase) *C
 // @Tags customers
 // @Produce json
 // @Param customer body service.SignUpCustomerDTO true "SignUpCustomerDTO object"
-// @Success 201 {object} domain.Customer
+// @Success 201 {object} service.CustomerDTO
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /customers/sign-up [post]
@@ -35,12 +35,17 @@ func (h *CustomerHandler) CustomerSignUp(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	customer, err := h.customerService.SignUp(productDTO)
+	customer, err := h.customerService.SignUp(productDTO.ToDomainCustomer())
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, customer)
+	return c.JSON(http.StatusCreated, service.CustomerDTO{
+		ID:    customer.ID,
+		Name:  customer.Name,
+		CPF:   customer.CPF,
+		Email: customer.Email,
+	})
 }
 
 // CustomerIdentify godoc
@@ -49,7 +54,7 @@ func (h *CustomerHandler) CustomerSignUp(c echo.Context) error {
 // @Tags customers
 // @Produce json
 // @Param cpf path string true "Customer CPF"
-// @Success 200 {object} domain.Customer
+// @Success 200 {object} service.CustomerDTO
 // @Failure 500 {object} map[string]string
 // @Router /customers/{cpf} [get]
 func (h *CustomerHandler) CustomerIdentify(c echo.Context) error {
@@ -60,5 +65,10 @@ func (h *CustomerHandler) CustomerIdentify(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, customer)
+	return c.JSON(http.StatusCreated, service.CustomerDTO{
+		ID:    customer.ID,
+		Name:  customer.Name,
+		CPF:   customer.CPF,
+		Email: customer.Email,
+	})
 }
