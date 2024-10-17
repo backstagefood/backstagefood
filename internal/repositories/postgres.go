@@ -1,4 +1,4 @@
-package db
+package repositories
 
 import (
 	"database/sql"
@@ -47,7 +47,7 @@ func (s *ApplicationDatabase) DataBaseHeatlh() error {
 
 func (s *ApplicationDatabase) ListProducts(description string) ([]*domain.Product, error) {
 	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category = b.id AND a.description ILIKE '%' || $1 || '%'"
-	stmt, err := s.SqlClient.Prepare(query)
+	stmt, err := s.sqlClient.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (s *ApplicationDatabase) ListProducts(description string) ([]*domain.Produc
 
 func (s *ApplicationDatabase) FindProductById(id string) (*domain.Product, error) {
 	query := "SELECT a.id, a.id_category, a.description, a.ingredients, a.price, a.created_at, a.updated_at, b.id, b.description FROM products a, product_categories b where a.id_category = b.id AND a.id = $1"
-	stmt, err := s.SqlClient.Prepare(query)
+	stmt, err := s.sqlClient.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
 		return nil, err
