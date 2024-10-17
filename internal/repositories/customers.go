@@ -16,7 +16,7 @@ type customerRepository struct {
 
 func NewCustomerRepository(database *ApplicationDatabase) CustomerRepository {
 	return &customerRepository{
-		sqlClient: database.SqlClient,
+		sqlClient: database.sqlClient,
 	}
 }
 
