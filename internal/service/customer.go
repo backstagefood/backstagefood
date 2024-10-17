@@ -39,12 +39,12 @@ func NewCustomerService(repository repositories.CustomerRepository) *CustomerSer
 	return &CustomerService{customerRepository: repository}
 }
 
-func (c *CustomerService) SignUp(customerDTO *domain.Customer) (*domain.Customer, error) {
-	if customerDTO.CPF == "" {
+func (c *CustomerService) SignUp(customer *domain.Customer) (*domain.Customer, error) {
+	if customer.CPF == "" {
 		return nil, domain.ErrCPFIsRequired
 	}
 
-	return c.customerRepository.SignUp(customerDTO)
+	return c.customerRepository.SignUp(customer)
 }
 
 func (c *CustomerService) Identify(cpf string) (*domain.Customer, error) {
