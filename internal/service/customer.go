@@ -17,7 +17,14 @@ type SignUpCustomerDTO struct {
 	Email string `json:"email"`
 }
 
-func (customerDTO *SignUpCustomerDTO) toDomainCustomer() *domain.Customer {
+type CustomerDTO struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	CPF   string `json:"cpf"`
+	Email string `json:"email"`
+}
+
+func (customerDTO *SignUpCustomerDTO) ToDomainCustomer() *domain.Customer {
 	return &domain.Customer{
 		ID:        uuid.New().String(),
 		Name:      customerDTO.Name,
@@ -32,12 +39,12 @@ func NewCustomerService(repository repositories.CustomerRepository) *CustomerSer
 	return &CustomerService{customerRepository: repository}
 }
 
-func (c *CustomerService) SignUp(customerDTO *SignUpCustomerDTO) (*domain.Customer, error) {
+func (c *CustomerService) SignUp(customerDTO *domain.Customer) (*domain.Customer, error) {
 	if customerDTO.CPF == "" {
 		return nil, domain.ErrCPFIsRequired
 	}
 
-	return c.customerRepository.SignUp(customerDTO.toDomainCustomer())
+	return c.customerRepository.SignUp(customerDTO)
 }
 
 func (c *CustomerService) Identify(cpf string) (*domain.Customer, error) {
