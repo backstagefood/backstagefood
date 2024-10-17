@@ -97,7 +97,7 @@ func (s *ApplicationDatabase) UpdateOrderStatus(orderId string) (*domain.Order, 
 	query := `
 		WITH updated_order AS (
 			UPDATE orders
-			SET status='Received', updated_at=now()
+			SET status='RECEIVED', updated_at=now()
 			WHERE id = $1 AND status = $2
 			RETURNING id, id_customer, status, notification_attempts, notified_at, created_at, updated_at
 		)
