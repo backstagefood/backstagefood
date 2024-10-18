@@ -1,45 +1,31 @@
-package service
+package services
 
 import (
 	"fmt"
 	"log/slog"
 
-	"github.com/backstagefood/backstagefood/internal/domain"
+	"github.com/backstagefood/backstagefood/internal/core/domain"
+	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
+	portService "github.com/backstagefood/backstagefood/internal/core/ports/services"
 	"github.com/google/uuid"
 )
 
-type ProductInterface interface {
-	ListProducts(description string) ([]*domain.Product, error)
-	FindProductById(id string) (*domain.Product, error)
-	CreateProduct(product *domain.Product) (*domain.Product, error)
-	GetCategoryID(categoryName string) (string, error)
-}
-
 type ProductService struct {
-	productRepository ProductInterface
+	productRepository portRepository.Product
 }
 
-type ProductDTO struct {
-	Id          string  `json:"id"`
-	Description string  `json:"description"`
-	Ingredients string  `json:"ingredients"`
-	Price       float64 `json:"price"`
-	IDCategory  string  `json:"category_id"`
-	Category    string  `json:"category"`
-}
-
-func NewProductService(repository ProductInterface) *ProductService {
+func NewProductService(repository portRepository.Product) portService.Product {
 	return &ProductService{productRepository: repository}
 }
 
-func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
+func (p *ProductService) GetProductById(id string) (*portService.ProductDTO, error) {
 	product, err := p.productRepository.FindProductById(id)
 	if err != nil {
 		slog.Error("error:", err)
 		return nil, fmt.Errorf("product with id: %s not found", id)
 	}
 
-	return &ProductDTO{
+	return &portService.ProductDTO{
 		Id:          product.ID,
 		Description: product.Description,
 		Ingredients: product.Ingredients,
@@ -49,16 +35,16 @@ func (p *ProductService) GetProductById(id string) (*ProductDTO, error) {
 	}, nil
 }
 
-func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) {
+func (p *ProductService) GetProducts(description string) ([]*portService.ProductDTO, error) {
 	productList, err := p.productRepository.ListProducts(description)
 	if err != nil {
 		slog.Error("error:", err)
-		return []*ProductDTO{}, fmt.Errorf("products not found")
+		return []*portService.ProductDTO{}, fmt.Errorf("products not found")
 	}
 
-	var output []*ProductDTO
+	var output []*portService.ProductDTO
 	for _, product := range productList {
-		output = append(output, &ProductDTO{
+		output = append(output, &portService.ProductDTO{
 			Id:          product.ID,
 			Description: product.Description,
 			Ingredients: product.Ingredients,
@@ -70,7 +56,7 @@ func (p *ProductService) GetProducts(description string) ([]*ProductDTO, error) 
 	return output, nil
 }
 
-func (p *ProductService) CreateProduct(productDTO *ProductDTO) (*ProductDTO, error) {
+func (p *ProductService) CreateProduct(productDTO *portService.ProductDTO) (*portService.ProductDTO, error) {
 	productToCreate := &domain.Product{
 		ID:          uuid.New().String(),
 		IDCategory:  productDTO.IDCategory,
@@ -91,7 +77,7 @@ func (p *ProductService) CreateProduct(productDTO *ProductDTO) (*ProductDTO, err
 		return nil, fmt.Errorf("error creating product")
 	}
 
-	return &ProductDTO{
+	return &portService.ProductDTO{
 		Id:          createdProduct.ID,
 		Description: createdProduct.Description,
 		Ingredients: createdProduct.Ingredients,

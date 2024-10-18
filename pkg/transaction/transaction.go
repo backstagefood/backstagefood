@@ -9,6 +9,10 @@ type SqlTransactionManager struct {
 	db *sql.DB
 }
 
+type TransactionManagerInterface interface {
+	RunWithTransaction(callback func() (interface{}, error)) (interface{}, error)
+}
+
 func New(db *sql.DB) *SqlTransactionManager {
 	return &SqlTransactionManager{db: db}
 }

@@ -1,24 +1,24 @@
 package handlers
 
 import (
-	"github.com/backstagefood/backstagefood/internal/domain"
+	"github.com/backstagefood/backstagefood/internal/core/domain"
+	portService "github.com/backstagefood/backstagefood/internal/core/ports/services"
+	"github.com/backstagefood/backstagefood/internal/core/services"
 	"github.com/backstagefood/backstagefood/internal/repositories"
-	"github.com/backstagefood/backstagefood/internal/service"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 )
 
 type CustomerHandler struct {
-	customerService *service.CustomerService
+	customerService portService.Customer
 }
 
 func NewCustomerHandler(databaseConnection *repositories.ApplicationDatabase) *CustomerHandler {
 	customerRepository := repositories.NewCustomerRepository(databaseConnection)
 
 	return &CustomerHandler{
-		customerService: service.NewCustomerService(customerRepository),
+		customerService: services.NewCustomerService(customerRepository),
 	}
 }
 
@@ -41,8 +41,8 @@ func (customerDTO *SignUpCustomerDTO) ToDomainCustomer() *domain.Customer {
 		Name:      customerDTO.Name,
 		CPF:       customerDTO.CPF,
 		Email:     customerDTO.Email,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: domain.GetNow(),
+		UpdatedAt: domain.GetNow(),
 	}
 }
 

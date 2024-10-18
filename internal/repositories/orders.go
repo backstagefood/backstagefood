@@ -2,50 +2,21 @@ package repositories
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/backstagefood/backstagefood/internal/core/domain"
-	_ "github.com/lib/pq"
-	"log/slog"
-	"os"
+	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
 )
 
-type ApplicationDatabase struct {
+type orderRepository struct {
 	sqlClient *sql.DB
 }
 
-func New() *ApplicationDatabase {
-	connStr := fmt.Sprintf(
-		"%s://%s:%s@%s/%s?sslmode=disable",
-		os.Getenv("DB_DRIVER"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_NAME"),
-	)
-
-	client, err := sql.Open(os.Getenv("DB_DRIVER"), connStr)
-	if err != nil {
-		slog.Error("error connect with database", err.Error(), err)
-		panic(err)
+func NewOrderRepository(database *ApplicationDatabase) portRepository.Order {
+	return &orderRepository{
+		sqlClient: database.sqlClient,
 	}
-
-	if err = client.Ping(); err != nil {
-		slog.Error("error ping database", err.Error(), err)
-		panic(err)
-	}
-
-	return &ApplicationDatabase{sqlClient: client}
 }
 
-func (s *ApplicationDatabase) Client() *sql.DB {
-	return s.sqlClient
-}
-
-func (s *ApplicationDatabase) DataBaseHeatlh() error {
-	return s.sqlClient.Ping()
-}
-
-func (s *ApplicationDatabase) UpdateOrderStatus(orderId string) (*domain.Order, error) {
+func (s *orderRepository) UpdateOrderStatus(orderId string) (*domain.Order, error) {
 	query := `
 		WITH updated_order AS (
 			UPDATE orders
@@ -78,4 +49,3 @@ func (s *ApplicationDatabase) UpdateOrderStatus(orderId string) (*domain.Order, 
 
 	return &order, nil
 }
-

@@ -46,7 +46,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.CheckoutServiceDTO"
+                            "$ref": "#/definitions/services.CheckoutServiceDTO"
                         }
                     },
                     "400": {
@@ -420,7 +420,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.CheckoutServiceDTO": {
+        "services.CheckoutServiceDTO": {
             "type": "object",
             "properties": {
                 "order": {

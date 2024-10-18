@@ -73,7 +73,7 @@ definitions:
       name:
         type: string
     type: object
-  service.CheckoutServiceDTO:
+  services.CheckoutServiceDTO:
     properties:
       order:
         $ref: '#/definitions/domain.Order'
@@ -110,7 +110,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/service.CheckoutServiceDTO'
+            $ref: '#/definitions/services.CheckoutServiceDTO'
         "400":
           description: Bad Request
           schema:
