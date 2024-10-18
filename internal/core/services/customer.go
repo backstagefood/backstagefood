@@ -1,15 +1,16 @@
-package service
+package services
 
 import (
-	"github.com/backstagefood/backstagefood/internal/domain"
-	"github.com/backstagefood/backstagefood/internal/repositories"
+	"github.com/backstagefood/backstagefood/internal/core/domain"
+	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
+	portService "github.com/backstagefood/backstagefood/internal/core/ports/services"
 )
 
 type CustomerService struct {
-	customerRepository repositories.CustomerRepository
+	customerRepository portRepository.Customer
 }
 
-func NewCustomerService(repository repositories.CustomerRepository) *CustomerService {
+func NewCustomerService(repository portRepository.Customer) portService.Customer {
 	return &CustomerService{customerRepository: repository}
 }
 

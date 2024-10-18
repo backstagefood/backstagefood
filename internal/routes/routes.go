@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/backstagefood/backstagefood/internal/handlers"
-	db "github.com/backstagefood/backstagefood/internal/repositories"
+	"github.com/backstagefood/backstagefood/internal/repositories"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -19,13 +19,17 @@ func New(echoEngine *echo.Echo) *Routes {
 	}
 }
 
-func (s *Routes) Start(port string, databaseConnection *db.ApplicationDatabase) {
+func (s *Routes) Start(port string, databaseConnection *repositories.ApplicationDatabase) {
 	defaultHandlers := handlers.New(s.echoEngine, databaseConnection)
 	customerHandler := handlers.NewCustomerHandler(databaseConnection)
+	productHandler := handlers.NewProductHandler(databaseConnection)
+	orderHandler := handlers.NewOrderHandler(databaseConnection)
 
 	s.routes(
 		defaultHandlers,
 		customerHandler,
+		productHandler,
+		orderHandler,
 	)
 
 	err := s.echoEngine.Start(":" + port)
@@ -35,16 +39,21 @@ func (s *Routes) Start(port string, databaseConnection *db.ApplicationDatabase) 
 	}
 }
 
-func (s *Routes) routes(defaultHandlers *handlers.Handler, customerHandler *handlers.CustomerHandler) {
-	s.echoEngine.GET("/health", defaultHandlers.Health())
-	s.echoEngine.GET("/products", defaultHandlers.ListAllProducts())
-	s.echoEngine.GET("/products/:id", defaultHandlers.FindProductById())
+func (s *Routes) routes(
+	defaultHandlers *handlers.Handler,
+	customerHandler *handlers.CustomerHandler,
+	productHandler *handlers.ProductHandler,
+	orderHandler *handlers.OrderHandler,
+) {
+	s.echoEngine.GET("/health", defaultHandlers.Health)
+	s.echoEngine.GET("/products", productHandler.ListAllProducts)
+	s.echoEngine.GET("/products/:id", productHandler.FindProductById)
 
 	s.echoEngine.POST("/customers/sign-up", customerHandler.CustomerSignUp)
 	s.echoEngine.GET("/customers/:cpf", customerHandler.CustomerIdentify)
 
-	s.echoEngine.POST("/checkout/:orderId", defaultHandlers.Checkout)
-	s.echoEngine.POST("/products", defaultHandlers.CreateProduct())
+	s.echoEngine.POST("/checkout/:orderId", orderHandler.Checkout)
+	s.echoEngine.POST("/products", productHandler.CreateProduct)
 
 	s.echoEngine.GET("/swagger/*", echoSwagger.WrapHandler)
 }

@@ -2,19 +2,15 @@ package repositories
 
 import (
 	"database/sql"
-	"github.com/backstagefood/backstagefood/internal/domain"
+	"github.com/backstagefood/backstagefood/internal/core/domain"
+	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
 )
-
-type CustomerRepository interface {
-	SignUp(*domain.Customer) (*domain.Customer, error)
-	Identify(string) (*domain.Customer, error)
-}
 
 type customerRepository struct {
 	sqlClient *sql.DB
 }
 
-func NewCustomerRepository(database *ApplicationDatabase) CustomerRepository {
+func NewCustomerRepository(database *ApplicationDatabase) portRepository.Customer {
 	return &customerRepository{
 		sqlClient: database.sqlClient,
 	}
