@@ -1,5 +1,7 @@
 package services
 
+import "github.com/backstagefood/backstagefood/internal/core/domain"
+
 // todo: must be domain
 type ProductDTO struct {
 	Id          string  `json:"id"`
@@ -12,10 +14,13 @@ type ProductDTO struct {
 
 type Product interface {
 	// todo: must be domain
-	GetProductById(id string) (*ProductDTO, error)
+	GetProductById(id string) (*domain.Product, error)
 	// todo: must be domain
-	GetProducts(description string) ([]*ProductDTO, error)
+	GetProducts(description string) ([]*domain.Product, error)
 	// todo: must be domain
-	CreateProduct(productDTO *ProductDTO) (*ProductDTO, error)
+	CreateProduct(productDTO *ProductDTO) (*domain.Product, error)
+	UpdateProduct(productDTO *ProductDTO) (*domain.Product, error)
+	DeleteProduct(productID string) error
 	GetCategoryID(categoryName string) (string, error)
+	GetCategories() ([]*domain.ProductCategory, error)
 }

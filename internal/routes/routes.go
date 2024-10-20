@@ -48,12 +48,16 @@ func (s *Routes) routes(
 	s.echoEngine.GET("/health", defaultHandlers.Health)
 	s.echoEngine.GET("/products", productHandler.ListAllProducts)
 	s.echoEngine.GET("/products/:id", productHandler.FindProductById)
+	s.echoEngine.GET("/categories", productHandler.ListAllCategories)
 
 	s.echoEngine.POST("/customers/sign-up", customerHandler.CustomerSignUp)
 	s.echoEngine.GET("/customers/:cpf", customerHandler.CustomerIdentify)
 
 	s.echoEngine.POST("/checkout/:orderId", orderHandler.Checkout)
 	s.echoEngine.POST("/products", productHandler.CreateProduct)
+
+	s.echoEngine.PUT("/products/:id", productHandler.UpdateProduct)
+	s.echoEngine.DELETE("/products/:id", productHandler.DeleteProduct)
 
 	s.echoEngine.GET("/swagger/*", echoSwagger.WrapHandler)
 }
