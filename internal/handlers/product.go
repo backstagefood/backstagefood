@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"net/http"
+
 	portService "github.com/backstagefood/backstagefood/internal/core/ports/services"
 	"github.com/backstagefood/backstagefood/internal/core/services"
 	"github.com/backstagefood/backstagefood/internal/repositories"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 type ProductHandler struct {
@@ -74,15 +75,75 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	if err := c.Bind(productDTO); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	category, err := h.productService.GetCategoryID(c.Param("category"))
+	categoryID, err := h.productService.GetCategoryID(productDTO.Category)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	productDTO.IDCategory = category
+	productDTO.IDCategory = categoryID
 	createdProduct, err := h.productService.CreateProduct(productDTO)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusCreated, createdProduct)
 
+}
+
+// UpdateProduct godoc
+// @Summary Update a product
+// @Description Update a product in the database.
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path string true "Product ID"
+// @Param product body domain.Product true "Product object"
+// @Success 200 {object} domain.Product
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /products/{id} [put]
+func (h *ProductHandler) UpdateProduct(c echo.Context) error {
+	productDTO := new(portService.ProductDTO)
+	if err := c.Bind(&productDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	productDTO.Id = c.Param("id")
+
+	updatedProduct, err := h.productService.UpdateProduct(productDTO)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, updatedProduct)
+}
+
+// DeleteProduct godoc
+// @Summary Delete a product
+// @Description Delete a product from the database.
+// @Tags products
+// @Param id path string true "Product ID"
+// @Success 204
+// @Failure 500 {object} map[string]string
+// @Router /products/{id} [delete]
+func (h *ProductHandler) DeleteProduct(c echo.Context) error {
+	productID := c.Param("id")
+	err := h.productService.DeleteProduct(productID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
+// ListAllCategories godoc
+// @Summary List all categories
+// @Description Get all categories available in the database.
+// @Tags products
+// @Produce json
+// @Success 200 {array} domain.ProductCategory
+// @Failure 500 {object} map[string]string
+// @Router /categories [get]
+func (h *ProductHandler) ListAllCategories(c echo.Context) error {
+	categories, err := h.productService.GetCategories()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, categories)
 }
