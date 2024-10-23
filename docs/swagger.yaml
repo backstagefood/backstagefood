@@ -82,6 +82,15 @@ definitions:
       paymentSucceeded:
         type: boolean
     type: object
+  services.CreateOrderDTO:
+    properties:
+      id_customer:
+        type: string
+      products_id:
+        items:
+          type: string
+        type: array
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -198,6 +207,60 @@ paths:
       summary: Health check
       tags:
       - health
+  /orders:
+    get:
+      description: Get all orders available in the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Order'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order in the database.
+      parameters:
+      - description: CreateOrderDTO object
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/services.CreateOrderDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/services.CreateOrderDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new order
+      tags:
+      - orders
   /products:
     get:
       description: Get all products available in the database.
