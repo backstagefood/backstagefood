@@ -1,5 +1,10 @@
 all: update up
 
+run: swagger exec
+
+exec:
+	@go run cmd/app/main.go
+
 update: 
 	@go get -u ./...
 	@go mod tidy
