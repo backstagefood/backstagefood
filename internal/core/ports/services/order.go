@@ -20,5 +20,5 @@ type Order interface {
 	// todo: must be domain
 	MakeCheckout(orderId string) (*CheckoutServiceDTO, error)
 	GetOrders() ([]*domain.Order, error)
-	CreateOrder(product *domain.Order) (*domain.Order, error)
+	CreateOrder(product *domain.Order) (map[string]string, error)
 }

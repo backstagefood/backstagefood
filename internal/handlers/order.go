@@ -82,7 +82,13 @@ func (o *OrderHandler) CreateOrder(c echo.Context) error {
 	if err := c.Bind(createOrderDTO); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	newOrder := domain.Order{CustomerID: createOrderDTO.CustomerID}
+	var productsList []domain.Product
+	for _, p := range createOrderDTO.Products {
+		productsList = append(productsList, domain.Product{
+			ID: p,
+		})
+	}
+	newOrder := domain.Order{CustomerID: createOrderDTO.CustomerID, Products: productsList}
 	order, err := o.orderService.CreateOrder(&newOrder)
 	fmt.Println("order ", order)
 	if err != nil {

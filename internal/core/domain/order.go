@@ -20,4 +20,5 @@ type Order struct {
 	NotifiedAt           *time.Time `json:"notified_at,omitempty"`
 	CreatedAt            *time.Time `json:"created_at,omitempty"`
 	UpdatedAt            *time.Time `json:"updated_at,omitempty"`
+	Products             []Product  `json:"products,omitempty"`
 }

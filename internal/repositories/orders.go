@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/backstagefood/backstagefood/internal/core/domain"
 	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
+	"github.com/lib/pq"
 )
 
 type orderRepository struct {
@@ -75,29 +76,43 @@ func (o *orderRepository) ListOrders() ([]*domain.Order, error) {
 	return orders, nil
 }
 
-func (o *orderRepository) CreateOrder(order *domain.Order) (*domain.Order, error) {
+func (o *orderRepository) CreateOrder(order *domain.Order) (map[string]string, error) {
+	//insertOrder := `
+	//	INSERT INTO orders
+	//	(id, id_customer, status, notification_attempts, notified_at, created_at, updated_at)
+	//	VALUES(gen_random_uuid(), $1, $2, 0, null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	//	RETURNING id, status, notified_at, created_at, updated_at
+	//`
 	query := `
-		INSERT INTO orders
-		(id, id_customer, status, notification_attempts, notified_at, created_at, updated_at)
-		VALUES(gen_random_uuid(), $1, $2, 0, null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-		RETURNING id, status, notified_at, created_at, updated_at
+		WITH InsertedOrder AS (
+			INSERT INTO orders
+			(id, id_customer, status, notification_attempts, notified_at, created_at, updated_at)
+			VALUES (gen_random_uuid(), $1, $2, 0, null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			RETURNING id
+		)
+		INSERT INTO order_products (id_order, id_product)
+		SELECT (SELECT id FROM InsertedOrder), unnest($3::uuid[])
+		RETURNING id_order
 	`
 	stmt, err := o.sqlClient.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
-
-	err = stmt.QueryRow(&order.CustomerID, domain.PENDING).Scan(
+	var listIds []string
+	for _, p := range order.Products {
+		listIds = append(listIds, p.ID)
+	}
+	err = stmt.QueryRow(&order.CustomerID, domain.PENDING, pq.Array(listIds)).Scan(
 		&order.ID,
-		&order.Status,
-		&order.NotifiedAt,
-		&order.CreatedAt,
-		&order.UpdatedAt,
+		//&order.Status,
+		//&order.NotifiedAt,
+		//&order.CreatedAt,
+		//&order.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
+	return map[string]string{"id": order.ID}, nil
 
-	return order, nil
 }
