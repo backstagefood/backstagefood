@@ -16,7 +16,7 @@ var (
 	error_payment_failed = errors.New("payment failed")
 )
 
-type CheckoutService struct {
+type OrderService struct {
 	transactionManager transaction.TransactionManagerInterface
 	orderRepository    portRepository.Order
 }
@@ -25,15 +25,15 @@ func NewOrderService(
 	orderRepository portRepository.Order,
 	transactionManager transaction.TransactionManagerInterface,
 ) portService.Order {
-	return &CheckoutService{
+	return &OrderService{
 		orderRepository:    orderRepository,
 		transactionManager: transactionManager,
 	}
 }
 
-func (c *CheckoutService) MakeCheckout(orderId string) (*portService.CheckoutServiceDTO, error) {
-	transactionResult, err := c.transactionManager.RunWithTransaction(func() (interface{}, error) {
-		updatedOrder, err := c.orderRepository.UpdateOrderStatus(orderId)
+func (o *OrderService) MakeCheckout(orderId string) (*portService.CheckoutServiceDTO, error) {
+	transactionResult, err := o.transactionManager.RunWithTransaction(func() (interface{}, error) {
+		updatedOrder, err := o.orderRepository.UpdateOrderStatus(orderId)
 		if err != nil {
 			return &portService.CheckoutServiceDTO{
 				PaymentSucceeded: true,
@@ -59,4 +59,13 @@ func (c *CheckoutService) MakeCheckout(orderId string) (*portService.CheckoutSer
 	})
 
 	return transactionResult.(*portService.CheckoutServiceDTO), err
+}
+
+func (o *OrderService) GetOrders() ([]*domain.Order, error) {
+	return o.orderRepository.ListOrders()
+}
+
+func (o *OrderService) CreateOrder(order *domain.Order) (*domain.Order, error) {
+	// todo validar mascara e existencia dos campos recebidos: ID_CUSTOMER e LISTA DE PRODUTOS
+	return o.orderRepository.CreateOrder(order)
 }

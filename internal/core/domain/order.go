@@ -18,6 +18,6 @@ type Order struct {
 	Status               string     `json:"status"`
 	NotificationAttempts int        `json:"notification_attempts"`
 	NotifiedAt           *time.Time `json:"notified_at,omitempty"`
-	CreatedAt            time.Time  `json:"created_at"`
-	UpdatedAt            time.Time  `json:"updated_at"`
+	CreatedAt            *time.Time `json:"created_at,omitempty"`
+	UpdatedAt            *time.Time `json:"updated_at,omitempty"`
 }
