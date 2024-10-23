@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	error_order_pending  = errors.New("order still pending")
-	error_payment_failed = errors.New("payment failed")
-	errorInsertOrder     = errors.New("create order failed")
+	errorOrderPending  = errors.New("order still pending")
+	errorPaymentFailed = errors.New("payment failed")
+	errorInsertOrder   = errors.New("create order failed")
 )
 
 type OrderService struct {
@@ -40,7 +40,7 @@ func (o *OrderService) MakeCheckout(orderId string) (*portService.CheckoutServic
 				PaymentSucceeded: true,
 				OrderStatus:      domain.PENDING,
 				Order:            updatedOrder,
-			}, error_order_pending
+			}, errorOrderPending
 		}
 
 		// TODO: FakeCheckout() need to be interfaced when the real web hook is implemented.
@@ -49,7 +49,7 @@ func (o *OrderService) MakeCheckout(orderId string) (*portService.CheckoutServic
 			return &portService.CheckoutServiceDTO{
 				PaymentSucceeded: false,
 				OrderStatus:      domain.PAYMENT_FAILED,
-			}, error_payment_failed
+			}, errorPaymentFailed
 		}
 
 		return &portService.CheckoutServiceDTO{
