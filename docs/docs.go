@@ -410,6 +410,12 @@ const docTemplate = `{
                 "notified_at": {
                     "type": "string"
                 },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Product"
+                    }
+                },
                 "status": {
                     "type": "string"
                 },

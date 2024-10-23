@@ -14,6 +14,7 @@ import (
 var (
 	error_order_pending  = errors.New("order still pending")
 	error_payment_failed = errors.New("payment failed")
+	errorInsertOrder     = errors.New("create order failed")
 )
 
 type OrderService struct {
@@ -65,7 +66,11 @@ func (o *OrderService) GetOrders() ([]*domain.Order, error) {
 	return o.orderRepository.ListOrders()
 }
 
-func (o *OrderService) CreateOrder(order *domain.Order) (*domain.Order, error) {
+func (o *OrderService) CreateOrder(order *domain.Order) (map[string]string, error) {
 	// todo validar mascara e existencia dos campos recebidos: ID_CUSTOMER e LISTA DE PRODUTOS
-	return o.orderRepository.CreateOrder(order)
+	createOrder, err := o.orderRepository.CreateOrder(order)
+	if err != nil {
+		return nil, errorInsertOrder
+	}
+	return createOrder, err
 }
