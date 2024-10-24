@@ -8,8 +8,8 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=${DB_NAME}
-    volumes:
-      - ${PWD}/db.sql:/docker-entrypoint-initdb.d/init.sql
+    # volumes:
+    #   - ${PWD}/db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
     healthcheck:

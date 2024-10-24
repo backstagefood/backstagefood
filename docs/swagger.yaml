@@ -212,34 +212,6 @@ paths:
       tags:
       - health
   /orders:
-    delete:
-      description: Delete an order in the database.
-      parameters:
-      - description: orderId
-        in: path
-        name: order
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Delete an order
-      tags:
-      - orders
     get:
       description: Get all orders available in the database.
       produces:
@@ -291,6 +263,60 @@ paths:
               type: string
             type: object
       summary: Create a new order
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      description: Get order by its ID.
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Order'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Find order by ID
+      tags:
+      - orders
+  /orders/{orderId}:
+    delete:
+      description: Delete an order in the database.
+      parameters:
+      - description: orderId
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an order
       tags:
       - orders
   /products:

@@ -71,6 +71,10 @@ func (o *OrderService) GetOrders() ([]*domain.Order, error) {
 	return o.orderRepository.ListOrders()
 }
 
+func (o *OrderService) FindOrderById(id string) (*domain.Order, error) {
+	return o.orderRepository.FindOrderById(id)
+}
+
 func (o *OrderService) CreateOrder(order *domain.Order) (map[string]string, error) {
 	// todo validar mascara e existencia dos campos recebidos: ID_CUSTOMER e LISTA DE PRODUTOS
 	createOrder, err := o.orderRepository.CreateOrder(order)
