@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/backstagefood/backstagefood/internal/core/domain"
 	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
@@ -61,6 +62,7 @@ func (o *orderRepository) ListOrders() ([]*domain.Order, error) {
 	query := "SELECT id, id_customer, status, notification_attempts, notified_at, created_at, updated_at FROM orders"
 	rows, err := o.sqlClient.Query(query)
 	if err != nil {
+		log.Println("couldn't list orders - query error:", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -82,13 +84,31 @@ func (o *orderRepository) ListOrders() ([]*domain.Order, error) {
 	return orders, nil
 }
 
+func (o *orderRepository) FindOrderById(id string) (*domain.Order, error) {
+	query := "SELECT id, id_customer, status, notification_attempts, notified_at, created_at, updated_at FROM orders WHERE id=$1"
+	stmt, err := o.sqlClient.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		log.Println("couldn't find order by ID - statement error:", err)
+		return nil, err
+	}
+	var order domain.Order
+	err = stmt.QueryRow(id).Scan(
+		&order.ID,
+		&order.CustomerID,
+		&order.Status,
+		&order.NotificationAttempts,
+		&order.NotifiedAt,
+		&order.CreatedAt,
+		&order.UpdatedAt)
+	if err != nil {
+		log.Println("couldn't find order by ID - query error:", err)
+		return nil, err
+	}
+	return &order, nil
+}
+
 func (o *orderRepository) CreateOrder(order *domain.Order) (map[string]string, error) {
-	//insertOrder := `
-	//	INSERT INTO orders
-	//	(id, id_customer, status, notification_attempts, notified_at, created_at, updated_at)
-	//	VALUES(gen_random_uuid(), $1, $2, 0, null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	//	RETURNING id, status, notified_at, created_at, updated_at
-	//`
 	query := `
 		WITH InsertedOrder AS (
 			INSERT INTO orders
@@ -102,6 +122,7 @@ func (o *orderRepository) CreateOrder(order *domain.Order) (map[string]string, e
 	`
 	stmt, err := o.sqlClient.Prepare(query)
 	if err != nil {
+		log.Println("couldn't create order - statement error:", err)
 		return nil, err
 	}
 	defer stmt.Close()
@@ -111,12 +132,9 @@ func (o *orderRepository) CreateOrder(order *domain.Order) (map[string]string, e
 	}
 	err = stmt.QueryRow(&order.CustomerID, domain.PENDING, pq.Array(listIds)).Scan(
 		&order.ID,
-		//&order.Status,
-		//&order.NotifiedAt,
-		//&order.CreatedAt,
-		//&order.UpdatedAt,
 	)
 	if err != nil {
+		log.Println("couldn't create order - query error:", err)
 		return nil, err
 	}
 	return map[string]string{"id": order.ID}, nil

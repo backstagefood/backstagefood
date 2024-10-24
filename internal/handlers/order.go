@@ -66,6 +66,25 @@ func (o *OrderHandler) ListAllOrders(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+// FindOrderById godoc
+// @Summary Find order by ID
+// @Description Get order by its ID.
+// @Tags orders
+// @Produce json
+// @Param id path string true "id"
+// @Success 200 {object} domain.Order
+// @Failure 500 {object} map[string]string
+// @Router /orders/{id} [get]
+func (o *OrderHandler) FindOrderById(c echo.Context) error {
+	id := c.Param("id")
+	fmt.Println("handler.FindOrderById", id)
+	result, err := o.orderService.FindOrderById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, result)
+}
+
 // CreateOrder godoc
 // @Summary Create a new order
 // @Description Create a new order in the database.
@@ -104,13 +123,14 @@ func (o *OrderHandler) CreateOrder(c echo.Context) error {
 // @Description Delete an order in the database.
 // @Tags orders
 // @Produce json
-// @Param order path string true "orderId"
+// @Param orderId path string true "orderId"
 // @Success 204
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /orders/{orderId} [delete]
 func (o *OrderHandler) DeleteOrder(c echo.Context) error {
 	orderId := c.Param("orderId")
+	fmt.Println("handler.DeleteOrder", orderId)
 	if orderId == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "order id maybe not exist"})
 	}
