@@ -301,6 +301,57 @@ const docTemplate = `{
             }
         },
         "/orders/{orderId}": {
+            "put": {
+                "description": "update order status.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "UpdateOrder update order status.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "orderId",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "UpdateStatusDTO object",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/services.UpdateStatusDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete an order in the database.",
                 "produces": [
@@ -474,16 +525,39 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.Customer": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.Order": {
             "type": "object",
             "properties": {
                 "created_at": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
+                "customer": {
+                    "$ref": "#/definitions/domain.Customer"
                 },
-                "id_customer": {
+                "id": {
                     "type": "string"
                 },
                 "notification_attempts": {
@@ -511,12 +585,20 @@ const docTemplate = `{
             "enum": [
                 "PENDING",
                 "RECEIVED",
-                "PAYMENT_FAILED"
+                "PAYMENT_FAILED",
+                "IN_PREPARATION",
+                "READY",
+                "COMPLETED",
+                "CANCELLED"
             ],
             "x-enum-varnames": [
                 "PENDING",
                 "RECEIVED",
-                "PAYMENT_FAILED"
+                "PAYMENT_FAILED",
+                "IN_PREPARATION",
+                "READY",
+                "COMPLETED",
+                "CANCELLED"
             ]
         },
         "domain.Product": {
@@ -615,6 +697,14 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "services.UpdateStatusDTO": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
                 }
             }
         }

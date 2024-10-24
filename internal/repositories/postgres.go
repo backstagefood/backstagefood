@@ -3,7 +3,6 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"github.com/backstagefood/backstagefood/internal/core/domain"
 	_ "github.com/lib/pq"
 	"log/slog"
 	"os"
@@ -44,38 +43,3 @@ func (s *ApplicationDatabase) Client() *sql.DB {
 func (s *ApplicationDatabase) DataBaseHeatlh() error {
 	return s.sqlClient.Ping()
 }
-
-func (s *ApplicationDatabase) UpdateOrderStatus(orderId string) (*domain.Order, error) {
-	query := `
-		WITH updated_order AS (
-			UPDATE orders
-			SET status='Received', updated_at=now()
-			WHERE id = $1 AND status = $2
-			RETURNING id, id_customer, status, notification_attempts, notified_at, created_at, updated_at
-		)
-		SELECT id, id_customer, status, notification_attempts, notified_at, created_at, updated_at
-		FROM updated_order;
-	`
-	stmt, err := s.sqlClient.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	var order domain.Order
-	err = stmt.QueryRow(orderId, domain.PENDING).Scan(
-		&order.ID,
-		&order.CustomerID,
-		&order.Status,
-		&order.NotificationAttempts,
-		&order.NotifiedAt,
-		&order.CreatedAt,
-		&order.UpdatedAt,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &order, nil
-}
-

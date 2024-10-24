@@ -108,7 +108,7 @@ func (o *OrderHandler) CreateOrder(c echo.Context) error {
 			ID: p,
 		})
 	}
-	newOrder := domain.Order{CustomerID: createOrderDTO.CustomerID, Products: productsList}
+	newOrder := domain.Order{Customer: domain.Customer{ID: createOrderDTO.CustomerID}, Products: productsList}
 	order, err := o.orderService.CreateOrder(&newOrder)
 	fmt.Println("order ", order)
 	if err != nil {
@@ -116,6 +116,40 @@ func (o *OrderHandler) CreateOrder(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, order)
 
+}
+
+// Checkout godoc
+// @Summary UpdateOrder update order status.
+// @Description update order status.
+// @Tags orders
+// @Produce json
+// @Param orderId path string true "orderId"
+// @Param order body services.UpdateStatusDTO true "UpdateStatusDTO object"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /orders/{orderId} [put]
+func (o *OrderHandler) UpdateOrder(c echo.Context) error {
+	orderId := c.Param("orderId")
+	var updateStatusDTO portService.UpdateStatusDTO
+	if err := c.Bind(&updateStatusDTO); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	if orderId == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "order id maybe not exist"})
+	}
+	var orderStatus domain.OrderStatus
+	orderStatus, err := orderStatus.GetOrderStatus(updateStatusDTO.Status)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	err = o.orderService.UpdateOrder(orderId, orderStatus)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusNoContent, nil)
 }
 
 // DeleteOrder godoc
