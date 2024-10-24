@@ -27,14 +27,14 @@ func (o *orderRepository) UpdateOrderStatus(tx *sql.Tx, orderId string) (*domain
 	query := `
 		WITH updated_order AS (
 			UPDATE orders
-			SET status='Received', updated_at=now()
+			SET status='RECEIVED', updated_at=now()
 			WHERE id = $1 AND status = $2
 			RETURNING id, id_customer, status, notification_attempts, notified_at, created_at, updated_at
 		)
 		SELECT id, id_customer, status, notification_attempts, notified_at, created_at, updated_at
 		FROM updated_order;
 	`
-	stmt, err := o.sqlClient.Prepare(query)
+	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
