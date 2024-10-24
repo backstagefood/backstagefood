@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/backstagefood/backstagefood/internal/core/domain"
 	portService "github.com/backstagefood/backstagefood/internal/core/ports/services"
 	"github.com/backstagefood/backstagefood/internal/repositories"
-	"net/http"
 
 	"github.com/backstagefood/backstagefood/internal/core/services"
 	"github.com/backstagefood/backstagefood/pkg/transaction"
@@ -96,4 +97,26 @@ func (o *OrderHandler) CreateOrder(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, order)
 
+}
+
+// DeleteOrder godoc
+// @Summary Delete an order
+// @Description Delete an order in the database.
+// @Tags orders
+// @Produce json
+// @Param order path string true "orderId"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /orders [delete]
+func (o *OrderHandler) DeleteOrder(c echo.Context) error {
+	orderId := c.Param("orderId")
+	if orderId == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "order id maybe not exist"})
+	}
+
+	if err := o.orderService.DeleteOrder(orderId); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusNoContent, nil)
 }

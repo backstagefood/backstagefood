@@ -10,21 +10,21 @@ type SqlTransactionManager struct {
 }
 
 type TransactionManagerInterface interface {
-	RunWithTransaction(callback func() (interface{}, error)) (interface{}, error)
+	RunWithTransaction(callback func(tx *sql.Tx) (interface{}, error)) (interface{}, error)
 }
 
 func New(db *sql.DB) *SqlTransactionManager {
 	return &SqlTransactionManager{db: db}
 }
 
-func (m *SqlTransactionManager) RunWithTransaction(callback func() (interface{}, error)) (interface{}, error) {
+func (m *SqlTransactionManager) RunWithTransaction(callback func(tx *sql.Tx) (interface{}, error)) (interface{}, error) {
 	slog.Info("[*] executing transaction")
 	tx, err := m.db.Begin()
 	if err != nil {
 		return nil, err
 	}
 
-	callbackResponse, err := callback()
+	callbackResponse, err := callback(tx)
 	if err != nil {
 		tx.Rollback()
 		slog.Info("[*] rollback executed")

@@ -58,6 +58,7 @@ func (s *Routes) routes(
 	s.echoEngine.POST("/checkout/:orderId", orderHandler.Checkout)
 	s.echoEngine.GET("/orders", orderHandler.ListAllOrders)
 	s.echoEngine.POST("/orders", orderHandler.CreateOrder)
+	s.echoEngine.DELETE("/orders/:orderId", orderHandler.DeleteOrder)
 
 	s.echoEngine.PUT("/products/:id", productHandler.UpdateProduct)
 	s.echoEngine.DELETE("/products/:id", productHandler.DeleteProduct)
