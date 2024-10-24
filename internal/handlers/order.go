@@ -108,7 +108,7 @@ func (o *OrderHandler) CreateOrder(c echo.Context) error {
 // @Success 204
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /orders [delete]
+// @Router /orders/{orderId} [delete]
 func (o *OrderHandler) DeleteOrder(c echo.Context) error {
 	orderId := c.Param("orderId")
 	if orderId == "" {
