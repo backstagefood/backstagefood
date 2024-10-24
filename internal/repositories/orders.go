@@ -2,9 +2,15 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
+
 	"github.com/backstagefood/backstagefood/internal/core/domain"
 	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
 	"github.com/lib/pq"
+)
+
+var (
+	errorMoreRowsWereDeletedThenExpected = errors.New("more rows were deleted than expected")
 )
 
 type orderRepository struct {
@@ -17,7 +23,7 @@ func NewOrderRepository(database *ApplicationDatabase) portRepository.Order {
 	}
 }
 
-func (o *orderRepository) UpdateOrderStatus(orderId string) (*domain.Order, error) {
+func (o *orderRepository) UpdateOrderStatus(tx *sql.Tx, orderId string) (*domain.Order, error) {
 	query := `
 		WITH updated_order AS (
 			UPDATE orders
@@ -115,4 +121,37 @@ func (o *orderRepository) CreateOrder(order *domain.Order) (map[string]string, e
 	}
 	return map[string]string{"id": order.ID}, nil
 
+}
+
+func (o *orderRepository) DeleteOrder(orderId string) error {
+	query := `
+		WITH deleted_order_products AS (
+			DELETE FROM order_products
+			WHERE id_order = $1
+			RETURNING id_order
+		)
+		DELETE FROM orders
+		WHERE id IN (SELECT id_order FROM deleted_order_products)
+	`
+
+	stmt, err := o.sqlClient.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	result, err := stmt.Exec(orderId)
+	if err != nil {
+		return err
+	}
+
+	oneLineExpected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if oneLineExpected != 1 {
+		return errorMoreRowsWereDeletedThenExpected
+	}
+
+	return nil
 }
