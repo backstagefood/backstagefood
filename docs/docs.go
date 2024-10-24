@@ -260,7 +260,47 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "description": "Get order by its ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Find order by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Order"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{orderId}": {
             "delete": {
                 "description": "Delete an order in the database.",
                 "produces": [
@@ -274,7 +314,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "orderId",
-                        "name": "order",
+                        "name": "orderId",
                         "in": "path",
                         "required": true
                     }
