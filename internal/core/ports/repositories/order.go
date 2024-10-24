@@ -11,5 +11,6 @@ type Order interface {
 	ListOrders() ([]*domain.Order, error)
 	FindOrderById(id string) (*domain.Order, error)
 	CreateOrder(product *domain.Order) (map[string]string, error)
+	UpdateOrder(tx *sql.Tx, orderId string, status domain.OrderStatus) (int64, error)
 	DeleteOrder(orderId string) error
 }

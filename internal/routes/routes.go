@@ -59,6 +59,7 @@ func (s *Routes) routes(
 	s.echoEngine.GET("/orders", orderHandler.ListAllOrders)
 	s.echoEngine.GET("/orders/:id", orderHandler.FindOrderById)
 	s.echoEngine.POST("/orders", orderHandler.CreateOrder)
+	s.echoEngine.PUT("/orders/:orderId", orderHandler.UpdateOrder)
 	s.echoEngine.DELETE("/orders/:orderId", orderHandler.DeleteOrder)
 
 	s.echoEngine.PUT("/products/:id", productHandler.UpdateProduct)
