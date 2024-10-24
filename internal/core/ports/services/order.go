@@ -9,6 +9,10 @@ type CreateOrderDTO struct {
 	Products   []string `json:"products_id"`
 }
 
+type UpdateStatusDTO struct {
+	Status string `json:"status"`
+}
+
 type CheckoutServiceDTO struct {
 	PaymentSucceeded bool               `json:"paymentSucceeded"`
 	OrderStatus      domain.OrderStatus `json:"orderStatus"`
@@ -20,5 +24,6 @@ type Order interface {
 	GetOrders() ([]*domain.Order, error)
 	FindOrderById(id string) (*domain.Order, error)
 	CreateOrder(product *domain.Order) (map[string]string, error)
+	UpdateOrder(orderId string, status domain.OrderStatus) error
 	DeleteOrder(orderId string) error
 }

@@ -3,6 +3,8 @@ package services
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
 
 	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
@@ -19,6 +21,7 @@ var (
 	errorPaymentFailed = errors.New("payment failed")
 	errorInsertOrder   = errors.New("create order failed")
 	errorInvalidUUID   = errors.New("invalid uuid")
+	errorUpdateOrder   = errors.New("update order failed")
 	errorDeleteOrder   = errors.New("error deleting an order")
 )
 
@@ -82,6 +85,23 @@ func (o *OrderService) CreateOrder(order *domain.Order) (map[string]string, erro
 		return nil, errorInsertOrder
 	}
 	return createOrder, err
+}
+
+func (o *OrderService) UpdateOrder(orderId string, status domain.OrderStatus) error {
+	tr, err := o.transactionManager.RunWithTransaction(func(tx *sql.Tx) (interface{}, error) {
+		return o.orderRepository.UpdateOrder(tx, orderId, status)
+	})
+	if err != nil {
+		slog.Error(fmt.Sprintf("couldn't update order %s", err.Error()))
+		return errorUpdateOrder
+	}
+	rowsAffected := tr.(int64)
+	if rowsAffected == 0 {
+		slog.Error("no rows affected")
+		return errorUpdateOrder
+	}
+	return nil
+
 }
 
 func (o *OrderService) DeleteOrder(orderId string) error {
