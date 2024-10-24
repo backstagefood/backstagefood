@@ -212,6 +212,34 @@ paths:
       tags:
       - health
   /orders:
+    delete:
+      description: Delete an order in the database.
+      parameters:
+      - description: orderId
+        in: path
+        name: order
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an order
+      tags:
+      - orders
     get:
       description: Get all orders available in the database.
       produces:

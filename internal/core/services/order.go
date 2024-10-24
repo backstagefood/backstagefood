@@ -1,11 +1,14 @@
 package services
 
 import (
+	"database/sql"
 	"errors"
+	"net/http"
+
 	portRepository "github.com/backstagefood/backstagefood/internal/core/ports/repositories"
 	portService "github.com/backstagefood/backstagefood/internal/core/ports/services"
 	"github.com/backstagefood/backstagefood/pkg/transaction"
-	"net/http"
+	"github.com/google/uuid"
 
 	"github.com/backstagefood/backstagefood/internal/core/domain"
 	paymentgateway "github.com/backstagefood/backstagefood/internal/core/services/payment_gateway"
@@ -15,6 +18,8 @@ var (
 	errorOrderPending  = errors.New("order still pending")
 	errorPaymentFailed = errors.New("payment failed")
 	errorInsertOrder   = errors.New("create order failed")
+	errorInvalidUUID   = errors.New("invalid uuid")
+	errorDeleteOrder   = errors.New("error deleting an order")
 )
 
 type OrderService struct {
@@ -33,8 +38,8 @@ func NewOrderService(
 }
 
 func (o *OrderService) MakeCheckout(orderId string) (*portService.CheckoutServiceDTO, error) {
-	transactionResult, err := o.transactionManager.RunWithTransaction(func() (interface{}, error) {
-		updatedOrder, err := o.orderRepository.UpdateOrderStatus(orderId)
+	transactionResult, err := o.transactionManager.RunWithTransaction(func(tx *sql.Tx) (interface{}, error) {
+		updatedOrder, err := o.orderRepository.UpdateOrderStatus(tx, orderId)
 		if err != nil {
 			return &portService.CheckoutServiceDTO{
 				PaymentSucceeded: true,
@@ -43,7 +48,7 @@ func (o *OrderService) MakeCheckout(orderId string) (*portService.CheckoutServic
 			}, errorOrderPending
 		}
 
-		// TODO: FakeCheckout() need to be interfaced when the real web hook is implemented.
+		// TODO: FakeCheckout() need to be interfaced when the real webhook is implemented.
 		paymentGatewayResponse := paymentgateway.PaymentCheckout()
 		if paymentGatewayResponse != http.StatusOK {
 			return &portService.CheckoutServiceDTO{
@@ -73,4 +78,16 @@ func (o *OrderService) CreateOrder(order *domain.Order) (map[string]string, erro
 		return nil, errorInsertOrder
 	}
 	return createOrder, err
+}
+
+func (o *OrderService) DeleteOrder(orderId string) error {
+	if err := uuid.Validate(orderId); err != nil {
+		return errorInvalidUUID
+	}
+
+	if err := o.orderRepository.DeleteOrder(orderId); err != nil {
+		return errorDeleteOrder
+	}
+
+	return nil
 }
