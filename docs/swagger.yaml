@@ -136,6 +136,27 @@ info:
   title: Backstage Food API
   version: "1.0"
 paths:
+  /categories:
+    get:
+      description: Get all categories available in the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.ProductCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all categories
+      tags:
+      - products
   /checkout/{orderId}:
     post:
       description: If payment succeeded then update order status.
@@ -242,6 +263,11 @@ paths:
   /orders:
     get:
       description: Get all orders available in the database.
+      parameters:
+      - description: Status
+        in: query
+        name: status
+        type: string
       produces:
       - application/json
       responses:
@@ -385,7 +411,7 @@ paths:
     get:
       description: Get all products available in the database.
       parameters:
-      - description: Descripion
+      - description: Description
         in: query
         name: description
         type: string
@@ -441,6 +467,26 @@ paths:
       tags:
       - products
   /products/{id}:
+    delete:
+      description: Delete a product from the database.
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a product
+      tags:
+      - products
     get:
       description: Get a specific product by its ID.
       parameters:
@@ -463,6 +509,44 @@ paths:
               type: string
             type: object
       summary: Find product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update a product in the database.
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product object
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a product
       tags:
       - products
 swagger: "2.0"

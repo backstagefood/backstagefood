@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/backstagefood/backstagefood/internal/core/domain"
@@ -55,11 +56,19 @@ func (o *OrderHandler) Checkout(c echo.Context) error {
 // @Description Get all orders available in the database.
 // @Tags orders
 // @Produce json
+// @Param status query string false "Status"
 // @Success 200 {array} domain.Order
 // @Failure 500 {object} map[string]string
 // @Router /orders [get]
 func (o *OrderHandler) ListAllOrders(c echo.Context) error {
-	result, err := o.orderService.GetOrders()
+	orderStatusParam := c.QueryParam("status")
+	var orderStatus domain.OrderStatus
+	os, err := orderStatus.GetOrderStatus(orderStatusParam)
+	log.Println("list com parametro ", orderStatusParam, os, err)
+	if err != nil && orderStatusParam != "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	result, err := o.orderService.GetOrders(&os)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

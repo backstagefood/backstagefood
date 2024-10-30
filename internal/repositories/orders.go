@@ -84,13 +84,21 @@ func (o *orderRepository) UpdateOrder(tx *sql.Tx, orderId string, status domain.
 	return rows, nil
 }
 
-func (o *orderRepository) ListOrders() ([]*domain.Order, error) {
+func (o *orderRepository) ListOrders(status *domain.OrderStatus) ([]*domain.Order, error) {
 	query := `
 	SELECT o.id, o.id_customer, c."name" , o.status, o.notification_attempts, o.notified_at, o.created_at, o.updated_at
 	 FROM orders o, customers c 
 	WHERE o.id_customer = c.id
+	  and o.status ILIKE '%' || $1 || '%' 
 	`
-	rows, err := o.sqlClient.Query(query)
+	stmt, err := o.sqlClient.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		log.Println("couldn't list orders - statement error:", err)
+		return nil, err
+	}
+
+	rows, err := stmt.Query(status)
 	if err != nil {
 		log.Println("couldn't list orders - query error:", err)
 		return nil, err

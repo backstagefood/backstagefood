@@ -21,7 +21,7 @@ type CheckoutServiceDTO struct {
 
 type Order interface {
 	MakeCheckout(orderId string) (*CheckoutServiceDTO, error)
-	GetOrders() ([]*domain.Order, error)
+	GetOrders(status *domain.OrderStatus) ([]*domain.Order, error)
 	FindOrderById(id string) (*domain.Order, error)
 	CreateOrder(product *domain.Order) (map[string]string, error)
 	UpdateOrder(orderId string, status domain.OrderStatus) error
