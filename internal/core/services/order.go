@@ -70,8 +70,8 @@ func (o *OrderService) MakeCheckout(orderId string) (*portService.CheckoutServic
 	return transactionResult.(*portService.CheckoutServiceDTO), err
 }
 
-func (o *OrderService) GetOrders() ([]*domain.Order, error) {
-	return o.orderRepository.ListOrders()
+func (o *OrderService) GetOrders(status *domain.OrderStatus) ([]*domain.Order, error) {
+	return o.orderRepository.ListOrders(status)
 }
 
 func (o *OrderService) FindOrderById(id string) (*domain.Order, error) {

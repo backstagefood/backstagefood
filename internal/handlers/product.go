@@ -26,7 +26,7 @@ func NewProductHandler(databaseConnection *repositories.ApplicationDatabase) *Pr
 // @Description Get all products available in the database.
 // @Tags products
 // @Produce json
-// @Param description query string false "Descripion"
+// @Param description query string false "Description"
 // @Success 200 {array} domain.Product
 // @Failure 500 {object} map[string]string
 // @Router /products [get]
