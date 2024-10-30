@@ -12,7 +12,11 @@ update:
 build: 
 	@docker build -t backstagefood:latest .
 
+setup-env:
+	@cp .env.example .env
+
 up:
+	@if [ ! -f .env ]; then $(MAKE) setup-env; fi
 	@docker compose up --build
 
 swagger:
