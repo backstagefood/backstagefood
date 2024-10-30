@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrCPFIsRequired = errors.New("cpf is required")
+	ErrCPFIsInvalid  = errors.New("cpf is invalid")
 )
 
 type Customer struct {
