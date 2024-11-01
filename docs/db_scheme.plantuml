@@ -1,0 +1,62 @@
+@startuml
+entity "customers" {
+    *id : uuid
+    --
+    name : varchar(255)
+    cpf : varchar(11)
+    email : varchar(255)
+    created_at : timestamptz
+    updated_at : timestamptz
+}
+
+entity "product_categories" {
+    *id : uuid
+    --
+    description : varchar(255)
+}
+
+entity "products" {
+    *id : uuid
+    id_category : uuid
+    description : varchar(255)
+    ingredients : text
+    price : decimal(10, 2)
+    created_at : timestamptz
+    updated_at : timestamptz
+}
+
+entity "order_status" {
+    *status : varchar(20)
+    --
+    description : varchar(255)
+}
+
+entity "orders" {
+    *id : uuid
+    id_customer : uuid
+    status : varchar(20)
+    notification_attempts : int
+    notified_at : timestamptz
+    created_at : timestamptz
+    updated_at : timestamptz
+}
+
+entity "order_products" {
+    id_order : uuid
+    id_product : uuid
+}
+
+entity "users" {
+    *id : uuid
+    --
+    username : varchar(255)
+    password : text
+}
+
+' Relacionamentos entre as tabelas
+customers ||--o{ orders : "id_customer"
+orders ||--o{ order_products : "id_order"
+products ||--o{ order_products : "id_product"
+product_categories ||--o{ products : "id_category"
+order_status ||-- orders : "status"
+@enduml
