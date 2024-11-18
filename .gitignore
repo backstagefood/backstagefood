@@ -26,5 +26,5 @@ cmd/app/.env
 /.idea/
 /go.sum
 
-backstagefood
+./backstagefood
 /.env

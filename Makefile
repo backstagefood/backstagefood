@@ -1,3 +1,5 @@
+VERSION := $(shell cat VERSION)
+
 all: update up
 
 run: swagger exec
@@ -9,8 +11,8 @@ update:
 	@go get -u ./...
 	@go mod tidy
 
-build: 
-	@docker build -t backstagefood:latest .
+docker-build:
+	@docker build -t backstagefood:$(VERSION) .
 
 setup-env:
 	@cp .env.example .env

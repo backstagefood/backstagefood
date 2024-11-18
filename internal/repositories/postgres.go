@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"log/slog"
+	"net/url"
 	"os"
 )
 
@@ -14,12 +15,13 @@ type ApplicationDatabase struct {
 
 func New() *ApplicationDatabase {
 	connStr := fmt.Sprintf(
-		"%s://%s:%s@%s/%s?sslmode=disable",
+		"%s://%s:%s@%s/%s%s",
 		os.Getenv("DB_DRIVER"),
 		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
+		url.QueryEscape(os.Getenv("DB_PASS")),
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_NAME"),
+		os.Getenv("DB_OPTIONS"),
 	)
 
 	client, err := sql.Open(os.Getenv("DB_DRIVER"), connStr)
